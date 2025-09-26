@@ -1,0 +1,241 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ======================================
+// USERS AND ROLES
+// ======================================
+
+model User {
+  id           Int       @id @default(autoincrement())
+  firstName    String    // Nombres del usuario
+  lastName1    String    // Apellido paterno
+  lastName2    String    // Apellido materno
+  email        String    @unique // Correo electrónico único
+  passwordHash String    // Hash de contraseña
+  roleId       Int       // ID del rol asignado
+  createdAt    DateTime  @default(now()) // Fecha de creación
+  updatedAt    DateTime  @updatedAt      // Fecha de actualización
+
+  // Relaciones
+  role      Role      @relation(fields: [roleId], references: [id])
+  contracts Contract[]
+  payments  Payment[]
+}
+
+model Role {
+  id          Int    @id @default(autoincrement())
+  name        String // Nombre del rol
+  description String? // Descripción del rol
+
+  // Relaciones
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id    Int    @id @default(autoincrement())
+  name  String // Nombre del permiso
+
+  // Relaciones
+  roles RolePermission[]
+}
+
+model RolePermission {
+  id           Int @id @default(autoincrement())
+  roleId       Int // ID del rol
+  permissionId Int // ID del permiso
+
+  // Relaciones
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+}
+
+// ======================================
+// VEHICLES
+// ======================================
+
+model Vehicle {
+  id           Int     @id @default(autoincrement())
+  brand        String  // Marca del vehículo
+  model        String  // Modelo
+  year         Int     // Año
+  engineType   String  // Tipo de motor
+  transmission String  // Tipo de transmisión
+  licensePlate String? @unique // Placas (únicas)
+
+  // Relaciones
+  contracts Contract[]
+  quotes    Quote[]
+}
+
+// ======================================
+// SERVICES
+// ======================================
+
+model Service {
+  id          Int     @id @default(autoincrement())
+  name        String  // Nombre del servicio
+  description String? // Descripción opcional
+  basePrice   Decimal @db.Decimal(10, 2) // Precio base
+
+  // Relaciones
+  contractServices ContractService[]
+}
+
+// ======================================
+// CONTRACTS
+// ======================================
+
+model Contract {
+  id              Int       @id @default(autoincrement())
+  clientName      String
+  vehicleId       Int
+  quoteId         Int?      // Cotización opcional
+  startDate       DateTime
+  endDate         DateTime?
+  status          String
+  qrCode          String?
+  responsibleUser Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relaciones
+  vehicle    Vehicle @relation(fields: [vehicleId], references: [id])
+  quote      Quote?  @relation(fields: [quoteId], references: [id])
+  responsible User    @relation(fields: [responsibleUser], references: [id])
+  services   ContractService[]
+  payments   Payment[]
+}
+
+
+model ContractService {
+  id         Int     @id @default(autoincrement())
+  contractId Int     // ID del contrato
+  serviceId  Int     // ID del servicio
+  price      Decimal @db.Decimal(10, 2) // Precio aplicado
+
+  // Relaciones
+  contract Contract @relation(fields: [contractId], references: [id])
+  service  Service  @relation(fields: [serviceId], references: [id])
+
+  @@unique([contractId, serviceId])
+}
+
+// ======================================
+// PAYMENTS
+// ======================================
+
+model Payment {
+  id              Int      @id @default(autoincrement())
+  contractId      Int?     // Contrato relacionado (opcional)
+  quoteId         Int?     // Cotización relacionada (opcional)
+  amount          Decimal  @db.Decimal(10, 2) // Monto pagado
+  method          String   // Método de pago
+  paymentDate     DateTime // Fecha de pago
+  voucherNumber   String?  // Folio del voucher (opcional)
+  voucherImage    String?  // Imagen del voucher (opcional)
+  responsibleUser Int      // Usuario responsable
+
+  // Relaciones
+  contract    Contract? @relation(fields: [contractId], references: [id])
+  quote       Quote?    @relation(fields: [quoteId], references: [id])
+  responsible User      @relation(fields: [responsibleUser], references: [id])
+}
+
+// ======================================
+// QUOTES
+// ======================================
+
+model Quote {
+  id                    Int      @id @default(autoincrement())
+  vehicleId             Int      // Vehículo asociado
+  generalNotes          String?  // Notas generales
+  repairEstimate        Decimal? @db.Decimal(10, 2) // Presupuesto de reparaciones
+  purchaseCheck         Boolean  // Chequeo compra-venta
+  fullVisualInspection  Boolean  // Inspección visual completa
+  chassisReview         String?  // Revisión del chasis
+  visibleDamages        String?  // Golpes visibles
+  createdAt             DateTime @default(now())
+
+  // Relaciones
+  vehicle         Vehicle        @relation(fields: [vehicleId], references: [id])
+  vehicleChecks   VehicleCheck[]
+  vehicleServices VehicleService[]
+  Contract Contract[]
+  Payment Payment[]
+}
+
+// ======================================
+// VEHICLE CHECKS (INSPECTION)
+// ======================================
+
+model VehicleCheck {
+  id                        Int     @id @default(autoincrement())
+  quoteId                   Int     // Cotización asociada
+  oilLevel                  String? // Marcador de aceite
+  temperatureLevel          String? // Marcador de temperatura
+  fuelLevel                 String? // Nivel de gasolina
+  batteryType               String?
+  batteryBrand              String?
+  batteryStatus             String?
+  scratches                 String?
+  dents                     String?
+  collisions                String?
+  windshieldStatus          String?
+  glassStatus               String?
+  engineOil                 String?
+  transmissionOil           String?
+  steeringOil               String?
+  brakeFluid                String?
+  wiperFluid                String?
+  frontTires                String?
+  frontBrakes               String?
+  rearTires                 String?
+  rearBrakes                String?
+  leakInspection            String?
+  brakeSystem               String?
+  engineSystem              String?
+  engineCoolingSystem       String?
+  transmissionCoolingSystem String?
+  shockAbsorbers            String?
+  belts                     String?
+  hoses                      String?
+  airFilter                  String?
+  steeringMechanism          String?
+  dustCoverArrows            String?
+  exhaustSystem              String?
+  steeringRod                String?
+  suspensionBushings         String?
+  bearings                   String?
+
+  // Relaciones
+  quote Quote @relation(fields: [quoteId], references: [id])
+}
+
+// ======================================
+// VEHICLE SERVICES (MAINTENANCE)
+// ======================================
+
+model VehicleService {
+  id                   Int     @id @default(autoincrement())
+  quoteId              Int     // Cotización asociada
+  oilChange            Boolean
+  tuneUp               Boolean
+  airFilterChange      Boolean
+  fuelFilterChange     Boolean
+  throttleBodyCleaning Boolean
+  iacValveCleaning     Boolean
+  mafSensorCleaning    Boolean
+  injectorCleaning     Boolean
+
+  // Relaciones
+  quote Quote @relation(fields: [quoteId], references: [id])
+}

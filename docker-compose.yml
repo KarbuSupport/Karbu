@@ -1,0 +1,20 @@
+# ONLY TESTING DATABASE INFORMATION
+
+version: "3.9"
+
+services:
+  karbu-db:
+    image: postgres:15
+    container_name: karbu-db
+    restart: always
+    environment:
+      POSTGRES_USER: karbuuser
+      POSTGRES_PASSWORD: karbupass
+      POSTGRES_DB: KarbuDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - karbu_data:/var/lib/postgresql/data
+
+volumes:
+  karbu_data:
