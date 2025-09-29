@@ -27,7 +27,7 @@ export function Header() {
             </div>
             <div className="flex items-center gap-1">
               <MapPin className="h-4 w-4 text-primary" />
-              <span>Ciudad de México, México</span>
+              <span>Guadalajara Jalisco, México</span>
             </div>
           </div>
           <div className="hidden md:block text-muted-foreground">Lunes a Viernes: 8:00 AM - 6:00 PM</div>
@@ -37,7 +37,7 @@ export function Header() {
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
             <h1 className="text-2xl font-bold text-foreground">
-              TALLER <span className="text-primary">MENDEZ</span>
+              Karbu<span className="text-primary">.com.mx</span>
             </h1>
           </div>
 

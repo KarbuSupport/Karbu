@@ -29,7 +29,7 @@ export function QuotesManagement() {
         </div>
         <Dialog open={isNewQuoteOpen} onOpenChange={setIsNewQuoteOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-accent hover:bg-accent/90">
+            <Button className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
               <Plus className="w-4 h-4 mr-2" />
               Nueva Cotización
             </Button>

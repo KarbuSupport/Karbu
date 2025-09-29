@@ -19,7 +19,7 @@ export function AboutSection() {
             </h2>
             <div className="space-y-6 text-lg text-muted-foreground">
               <p className="text-pretty">
-                <strong className="text-foreground">Taller Mendez</strong> es una empresa familiar con más de 20 años de
+                <strong className="text-foreground">Karbu.com.mx</strong> es una empresa familiar con más de 20 años de
                 experiencia en el sector automotriz. Nos especializamos en brindar servicios de reparación de alta
                 calidad respaldados por seguros especializados que protegen la inversión de nuestros clientes.
               </p>
@@ -39,7 +39,7 @@ export function AboutSection() {
           <div className="space-y-6">
             <img
               src="/modern-automotive-workshop-interior-with-professio.jpg"
-              alt="Taller Mendez - Instalaciones"
+              alt="Karbu.com.mx - Instalaciones"
               className="w-full rounded-lg shadow-lg"
             />
 

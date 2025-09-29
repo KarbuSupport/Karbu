@@ -15,18 +15,18 @@ const services = [
     description: "Diagnóstico y reparación de sistemas mecánicos con tecnología de punta.",
     features: ["Diagnóstico computarizado", "Garantía de 6 meses", "Refacciones originales"],
   },
-  {
-    icon: Zap,
-    title: "Sistema Eléctrico",
-    description: "Reparación especializada en sistemas eléctricos y electrónicos automotrices.",
-    features: ["Escáner automotriz", "Reparación de ECU", "Instalación de accesorios"],
-  },
-  {
-    icon: Paintbrush,
-    title: "Hojalatería y Pintura",
-    description: "Restauración completa de carrocería con acabados de calidad premium.",
-    features: ["Cabina de pintura", "Igualación de color", "Enderezado y soldadura"],
-  },
+  // {
+  //   icon: Zap,
+  //   title: "Sistema Eléctrico",
+  //   description: "Reparación especializada en sistemas eléctricos y electrónicos automotrices.",
+  //   features: ["Escáner automotriz", "Reparación de ECU", "Instalación de accesorios"],
+  // },
+  // {
+  //   icon: Paintbrush,
+  //   title: "Hojalatería y Pintura",
+  //   description: "Restauración completa de carrocería con acabados de calidad premium.",
+  //   features: ["Cabina de pintura", "Igualación de color", "Enderezado y soldadura"],
+  // },
   {
     icon: Car,
     title: "Mantenimiento Preventivo",
@@ -55,7 +55,7 @@ export function ServicesSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           {services.map((service, index) => (
             <Card key={index} className="bg-card border-2 border-border hover:shadow-lg transition-shadow">
               <CardHeader className="text-center">

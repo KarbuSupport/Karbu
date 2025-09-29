@@ -79,7 +79,7 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
             <div className="grid grid-cols-2 gap-4">
               <Button
                 variant="outline"
-                className="h-20 flex-col bg-transparent"
+                className="h-20 flex-col bg-transparent hover:cursor-pointer"
                 onClick={() => onSectionChange?.("quotes")}
               >
                 <FileText className="w-6 h-6 mb-2" />
@@ -87,7 +87,7 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
               </Button>
               <Button
                 variant="outline"
-                className="h-20 flex-col bg-transparent"
+                className="h-20 flex-col bg-transparent hover:cursor-pointer"
                 onClick={() => onSectionChange?.("contracts")}
               >
                 <FileContract className="w-6 h-6 mb-2" />
@@ -95,7 +95,7 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
               </Button>
               <Button
                 variant="outline"
-                className="h-20 flex-col bg-transparent"
+                className="h-20 flex-col bg-transparent hover:cursor-pointer"
                 onClick={() => onSectionChange?.("payments")}
               >
                 <CreditCard className="w-6 h-6 mb-2" />
@@ -103,7 +103,7 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
               </Button>
               <Button
                 variant="outline"
-                className="h-20 flex-col bg-transparent"
+                className="h-20 flex-col bg-transparent hover:cursor-pointer"
                 onClick={() => onSectionChange?.("qr-search")}
               >
                 <QrCode className="w-6 h-6 mb-2" />

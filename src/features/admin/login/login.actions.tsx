@@ -39,3 +39,19 @@ export async function loginAction(_: unknown, formData: FormData) {
     return { success: false, message: "Error interno del servidor" }
   }
 }
+
+export async function logoutAction() {
+  try {
+    // Elimina la cookie 'auth_token'
+    cookies().set('auth_token', '', {
+      httpOnly: true,
+      maxAge: 0, // Expira inmediatamente
+      path: '/',
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('Error en logoutAction:', error)
+    return { success: false, message: "Error al cerrar sesión" }
+  }
+}

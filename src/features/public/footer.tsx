@@ -8,7 +8,7 @@ export function Footer() {
           {/* Información de la empresa */}
           <div>
             <h3 className="text-xl font-bold mb-4">
-              TALLER <span className="text-primary">MENDEZ</span>
+              Karbu<span className="text-primary">.com.mx</span>
             </h3>
             <p className="text-secondary-foreground/80 mb-4 text-pretty">
               Más de 20 años brindando servicios automotrices de calidad con seguros especializados que protegen tu
@@ -119,7 +119,7 @@ export function Footer() {
 
         <div className="border-t border-secondary-foreground/20 mt-8 pt-8 text-center">
           <p className="text-secondary-foreground/60 text-sm">
-            © 2024 Taller Mendez. Todos los derechos reservados. | Diseñado con ❤️ para brindar el mejor servicio
+            © 2024 Karbu.com.mx. Todos los derechos reservados. | Diseñado con ❤️ para brindar el mejor servicio
             automotriz.
           </p>
         </div>

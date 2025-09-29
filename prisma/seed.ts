@@ -14,10 +14,46 @@ async function main() {
   // =========================
   // PERMISOS
   // =========================
-  const viewContract = await prisma.permission.create({ data: { name: "view_contracts" } });
-  const editContract = await prisma.permission.create({ data: { name: "edit_contracts" } });
-  const managePayments = await prisma.permission.create({ data: { name: "manage_payments" } });
+ const allPermissions = [
+    "Ver Dashboard",
+    "Ver Cotizaciones",
+    "Crear Cotizaciones",
+    "Editar Cotizaciones",
+    "Eliminar Cotizaciones",
+    "Ver Contratos",
+    "Crear Contratos",
+    "Editar Contratos",
+    "Eliminar Contratos",
+    "Ver Pagos",
+    "Crear Pagos",
+    "Editar Pagos",
+    "Eliminar Pagos",
+    "Ver Usuarios",
+    "Crear Usuarios",
+    "Editar Usuarios",
+    "Eliminar Usuarios",
+    "Ver Roles y Permisos",
+    "Crear Roles y Permisos",
+    "Editar Roles y Permisos",
+    "Eliminar Roles y Permisos",
+    "Busqueda QR",
+  ];
 
+  const permissionRecords = await Promise.all(
+    allPermissions.map(name => prisma.permission.create({ data: { name } }))
+  );
+
+    // =========================
+  // ASIGNAR PERMISOS A ROLES
+  // =========================
+  // Admin: todos los permisos
+  await Promise.all(
+    permissionRecords.map(p =>
+      prisma.rolePermission.create({
+        data: { roleId: adminRole.id, permissionId: p.id },
+      })
+    )
+  );
   // =========================
   // USUARIOS
   // =========================

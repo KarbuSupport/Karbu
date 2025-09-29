@@ -120,7 +120,7 @@ export function LoginForm() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base transition-colors"
+              className="w-full h-12 bg-primary hover:bg-primary/90 hover:cursor-pointer text-primary-foreground font-semibold text-base transition-colors"
             >
               Iniciar Sesión
             </Button>

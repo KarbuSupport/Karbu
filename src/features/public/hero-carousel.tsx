@@ -34,7 +34,7 @@ export function HeroCarousel() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 5000)
+    }, 7000) // 7 Segundos
     return () => clearInterval(timer)
   }, [])
 
@@ -47,7 +47,7 @@ export function HeroCarousel() {
   }
 
   return (
-    <section id="inicio" className="relative bg-gradient-to-r from-secondary to-secondary/90 text-secondary-foreground">
+    <section id="inicio" className="relative min-h-[600px] bg-gradient-to-r from-secondary to-secondary/90 text-secondary-foreground">
       <div className="container mx-auto px-4 py-20">
         <div className="relative">
           {slides.map((slide, index) => (
