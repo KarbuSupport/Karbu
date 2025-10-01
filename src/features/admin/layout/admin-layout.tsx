@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/src/shared/components/ui/button"
 import { Input } from "@/src/shared/components/ui/input"
 import { Badge } from "@/src/shared/components/ui/badge"
@@ -21,14 +21,15 @@ import {
 } from "lucide-react"
 import { logoutAction } from "../login/login.actions"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/src/shared/context/AuthContext"
 
 const navigationItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "quotes", label: "Cotizaciones", icon: FileText },
-  { id: "contracts", label: "Contratos", icon: FileContract },
-  { id: "payments", label: "Pagos", icon: CreditCard },
-  { id: "qr-search", label: "Búsqueda QR", icon: QrCode },
-  { id: "user-management", label: "Roles y Permisos", icon: Settings },
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, requiredPermission: "View_Dashboard" },
+  { id: "quotes", label: "Cotizaciones", icon: FileText, requiredPermission: "View_Quotations" },
+  { id: "contracts", label: "Contratos", icon: FileContract, requiredPermission: "View_Contracts" },
+  { id: "payments", label: "Pagos", icon: CreditCard, requiredPermission: "View_Payments" },
+  { id: "qr-search", label: "Búsqueda QR", icon: QrCode, requiredPermission: "QR_Search" },
+  { id: "user-management", label: "Roles y Permisos", icon: Settings, requiredPermission: "View_Roles_and_Permissions" },
 ]
 
 interface AdminLayoutProps {
@@ -42,6 +43,7 @@ interface AdminLayoutProps {
 export function AdminLayout({ children, activeSection, onSectionChange }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const router = useRouter()
+  const { permissions } = useAuth() // 👈 Traemos permisos del contexto
 
   const handleLogOut = async () => {
     const result = await logoutAction();
@@ -50,6 +52,8 @@ export function AdminLayout({ children, activeSection, onSectionChange }: AdminL
       router.push("/admin/login")
   }
 }
+
+
 
   return (
     <div className="flex h-screen bg-background">
@@ -68,7 +72,7 @@ export function AdminLayout({ children, activeSection, onSectionChange }: AdminL
   </div>
 
   <nav className="p-4 space-y-2">
-    {navigationItems.map((item) => {
+    {navigationItems.filter((item) => permissions.includes(item.requiredPermission)).map((item) => {
       const Icon = item.icon
       return (
         <Button
