@@ -14,7 +14,7 @@ export async function loginAction(_: unknown, formData: FormData) {
     }
 
     const authResult = await authenticateUser({ email, passwordHash })
-
+    
     if (!authResult.success) {
       return { success: false, message: authResult.error }
     }
@@ -22,7 +22,12 @@ export async function loginAction(_: unknown, formData: FormData) {
     const user = authResult.user
 
     const token = sign(
-      { sub: user.id, email: user.email },
+      { 
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        permissions: user.permissions,
+      },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }
     )
@@ -33,7 +38,7 @@ export async function loginAction(_: unknown, formData: FormData) {
       path: '/',
     })
 
-    return { success: true }
+    return { success: true, user }
   } catch (error) {
     console.error('Error en loginAction:', error)
     return { success: false, message: "Error interno del servidor" }

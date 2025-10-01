@@ -14,6 +14,7 @@ import {
 import { Eye, EyeOff, User, Lock } from "lucide-react"
 import { loginAction } from "./login.actions"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/src/shared/context/AuthContext"
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
@@ -21,25 +22,26 @@ export function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const { setPermissions } = useAuth()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setError("")
 
-    const formData = new FormData()
-    formData.append("email", email)
-    formData.append("password", password)
+  const formData = new FormData()
+  formData.append("email", email)
+  formData.append("password", password)
 
-    const result = await loginAction(undefined, formData)
-    console.log("result.message",result);
+  const result = await loginAction(undefined, formData)
 
-    if (result.success) {
-      router.push("/admin/dashboard")
-    } else {
-      setError(result.message ?? "Error al iniciar sesión")
-      console.log("result.message",result.message);
-    }
+  if (result.success && result.user) {
+    // ✅ Guardar permisos en el contexto ANTES de redirigir
+    setPermissions(result.user.permissions || [])
+    router.push("/admin/dashboard")
+  } else {
+    setError(result.message ?? "Error al iniciar sesión")
   }
+}
 
   return (
     
