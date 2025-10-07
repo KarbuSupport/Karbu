@@ -50,66 +50,65 @@ export function AdminLayout({ children, activeSection, onSectionChange }: AdminL
 
     if (result.success) {
       router.push("/admin/login")
+    }
   }
-}
 
 
 
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-<div
-  className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}
->
-  <div className="flex items-center justify-between h-16 px-6 border-b border-sidebar-border">
-    <div className="flex items-center space-x-2">
-      <Car className="w-8 h-8 text-accent" />
-      <span className="text-xl font-bold">Karbu.com.mx</span>
-    </div>
-    <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(false)}>
-      <X className="w-4 h-4" />
-    </Button>
-  </div>
+      <div
+        className={`${sidebarOpen ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col`}
+      >
+        <div className="flex items-center justify-between h-16 px-6 border-b border-sidebar-border">
+          <div className="flex items-center space-x-2">
+            <Car className="w-8 h-8 text-accent" />
+            <span className="text-xl font-bold">Karbu.com.mx</span>
+          </div>
+          <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(false)}>
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
 
-  <nav className="p-4 space-y-2">
-    {navigationItems.filter((item) => permissions.includes(item.requiredPermission)).map((item) => {
-      const Icon = item.icon
-      return (
-        <Button
-          key={item.id}
-          variant={activeSection === item.id ? "default" : "ghost"}
-          className={`w-full justify-start ${
-            activeSection === item.id
-              ? "bg-sidebar-primary text-sidebar-primary-foreground hover:cursor-pointer"
-              : "hover:bg-sidebar-primary hover:text-sidebar-primary-foreground hover:cursor-pointer"
-          }`}
-          onClick={() => {
-            onSectionChange(item.id)
-            setSidebarOpen(false)
-          }}
-        >
-          <Icon className="w-4 h-4 mr-3" />
-          {item.label}
-        </Button>
-      )
-    })}
-  </nav>
+        <nav className="p-4 space-y-2">
+          {navigationItems.filter((item) => permissions.includes(item.requiredPermission)).map((item) => {
+            const Icon = item.icon
+            return (
+              <Button
+                key={item.id}
+                variant={activeSection === item.id ? "default" : "ghost"}
+                className={`w-full justify-start ${activeSection === item.id
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground hover:cursor-pointer"
+                    : "hover:bg-sidebar-primary hover:text-sidebar-primary-foreground hover:cursor-pointer"
+                  }`}
+                onClick={() => {
+                  onSectionChange(item.id)
+                  setSidebarOpen(false)
+                }}
+              >
+                <Icon className="w-4 h-4 mr-3" />
+                {item.label}
+              </Button>
+            )
+          })}
+        </nav>
 
-  {/* Logout Button - fixed at bottom */}
-  <div className="mt-auto p-4">
-    <Button
-      variant="outline"
-      size="sm"
-      className="flex items-center w-full hover:bg-destructive hover:text-destructive-foreground hover:cursor-pointer bg-transparent"
-      onClick={() => {
-        handleLogOut()
-      }}
-    >
-      <LogOut className="w-4 h-4" />
-      <span>Cerrar Sesión</span>
-    </Button>
-  </div>
-</div>
+        {/* Logout Button - fixed at bottom */}
+        <div className="mt-auto p-4">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center w-full hover:bg-destructive hover:text-destructive-foreground hover:cursor-pointer bg-transparent"
+            onClick={() => {
+              handleLogOut()
+            }}
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Cerrar Sesión</span>
+          </Button>
+        </div>
+      </div>
 
 
       {/* Main Content */}
