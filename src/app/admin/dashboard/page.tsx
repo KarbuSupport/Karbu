@@ -7,6 +7,7 @@ import { DashboardOverview } from "@/src/features/admin/dashboard/dashboard-over
 import { QuotesManagement } from "@/src/features/admin/quotes/quotes-management"
 import { RolesManagement } from "@/src/features/admin/user-roles-management/user-roles-management"
 import { useAuth } from "@/src/shared/context/AuthContext"
+import { ContractsManagement } from "@/src/features/admin/contracts/contract-management"
 
 export default function AdminPage() {
   const { permissions } = useAuth()
@@ -42,7 +43,7 @@ export default function AdminPage() {
       case "quotes":
         return <QuotesManagement />
       case "contracts":
-        return <div>Gestión de contratos</div>
+        return <ContractsManagement/>
       case "payments":
         return <div>Gestión de pagos</div>
       case "qr-search":
