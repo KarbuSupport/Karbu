@@ -211,6 +211,7 @@ async function main() {
       startDate: new Date(),
       status: "Active",
       responsibleUser: adminUser.id,
+      qrCode: "asd-34-2",
       services: {
         create: [
           { serviceId: oilChange.id, price: 500 },
@@ -227,6 +228,7 @@ async function main() {
       startDate: new Date(),
       status: "Pending",
       responsibleUser: techUser.id,
+      qrCode: "asd-34-2-3",
       services: {
         create: [
           { serviceId: oilChange.id, price: 550 },
@@ -244,6 +246,7 @@ async function main() {
       startDate: new Date(),
       status: "Active",
       responsibleUser: receptionUser.id,
+      qrCode: "asd-34-222",
       services: {
         create: [{ serviceId: brakeCheck.id, price: 400 }],
       },

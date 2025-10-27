@@ -8,6 +8,8 @@ import { QuotesManagement } from "@/src/features/admin/quotes/quotes-management"
 import { RolesManagement } from "@/src/features/admin/user-roles-management/user-roles-management"
 import { useAuth } from "@/src/shared/context/AuthContext"
 import { ContractsManagement } from "@/src/features/admin/contracts/contract-management"
+import { PaymentsManagement } from "@/src/features/admin/payments/payments-management"
+import { QRSearch } from "@/src/features/admin/qr-search/qr-search"
 
 export default function AdminPage() {
   const { permissions } = useAuth()
@@ -45,9 +47,9 @@ export default function AdminPage() {
       case "contracts":
         return <ContractsManagement/>
       case "payments":
-        return <div>Gestión de pagos</div>
+        return <PaymentsManagement/>
       case "qr-search":
-        return <div>Búsqueda QR</div>
+        return <QRSearch/>
       case "user-management":
         return <RolesManagement />
       default:
