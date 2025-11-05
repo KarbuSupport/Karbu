@@ -140,7 +140,7 @@ ventas@karbu.com.mx
   attachments: [
     {
       filename: "logo-karbu.png",
-      path: "./public/karbu-logo.png", // ruta dentro de tu proyecto
+      path: "/karbu-logo.png", // ruta dentro de tu proyecto
       cid: "logoKarbu", // este ID se usa dentro del HTML
     },
   ],
@@ -260,7 +260,7 @@ ventas@karbu.com.mx
   attachments: [
     {
       filename: "logo-karbu.png",
-      path: "./public/karbu-logo.png", // ruta dentro de tu proyecto
+      path: "/karbu-logo.png", // ruta dentro de tu proyecto
       cid: "logoKarbu", // este ID se usa dentro del HTML
     },
   ],
