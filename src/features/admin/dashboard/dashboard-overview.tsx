@@ -3,10 +3,13 @@
 import { Button } from "@/src/shared/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
 import { FileText, LucideContrast as FileContract, CreditCard, QrCode } from "lucide-react"
+import { getContractsWithStatusAction } from "../contracts/contract.actions"
+import { useEffect, useState } from "react"
 
-const contractStats = [
-  { label: "Contratos Vigentes", value: 245, color: "bg-green-500" },
-  { label: "Contratos Caducados", value: 18, color: "bg-red-500" },
+const initialStats = [
+  { label: "Contratos Vigentes y Pagados", value: 0, color: "bg-green-500" },
+  { label: "Contratos Vigentes y Con Deuda", value: 0, color: "bg-yellow-500" },
+  { label: "Contratos Vencidos", value: 0, color: "bg-red-500" },
 ]
 
 const recentActivity = [
@@ -21,6 +24,25 @@ interface DashboardOverviewProps {
 }
 
 export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
+  const [contractStats, setContractStats] = useState(initialStats)
+  const handleContracts = async () => {
+    const result = await getContractsWithStatusAction()
+    if (result.success && result.data) {
+      const statusCount = result.data
+      setContractStats([
+      {...contractStats[0], value: statusCount.CurrentAndPaid},
+      {...contractStats[1], value: statusCount.CurrentAndInDebt},
+      {...contractStats[2], value: statusCount.Expired},
+      ])
+    } else {
+      console.error("Error fetching contract stats:", result.error)
+    }
+  }
+
+  useEffect(() => {
+    handleContracts()
+  }, [])
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -31,7 +53,7 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {contractStats.map((stat, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -46,8 +68,8 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+        {/* <Card>
           <CardHeader>
             <CardTitle>Actividad Reciente</CardTitle>
             <CardDescription>Últimas transacciones y eventos del sistema</CardDescription>
@@ -68,7 +90,7 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card>
           <CardHeader>

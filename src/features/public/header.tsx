@@ -27,7 +27,8 @@ export function Header() {
             </div>
             <div className="flex items-center gap-1">
               <MapPin className="h-4 w-4 text-primary" />
-              <span>Guadalajara Jalisco, México</span>
+              <span>C. Rita Pérez de Moreno 815, Santa María, 44719 Guadalajara, Jal.</span>
+
             </div>
           </div>
           <div className="hidden md:block text-muted-foreground">Lunes a Viernes: 8:00 AM - 6:00 PM</div>

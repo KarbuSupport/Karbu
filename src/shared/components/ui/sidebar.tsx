@@ -7,23 +7,23 @@ import { PanelLeftIcon } from 'lucide-react'
 
 import { useIsMobile } from '@/src/shared/hooks/use-mobile'
 import { cn } from '@/src/lib/utils'
-import { Button } from '@/src/components/ui/button'
-import { Input } from '@/src/components/ui/input'
-import { Separator } from '@/src/components/ui/separator'
+import { Button } from '@/src/shared/components/ui/button'
+import { Input } from '@/src/shared/components/ui/input'
+import { Separator } from '@/src/shared/components/ui/separator'
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/src/components/ui/sheet'
-import { Skeleton } from '@/src/components/ui/skeleton'
+} from '@/src/shared/components/ui/sheet'
+import { Skeleton } from '@/src/shared/components/ui/skeleton'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/src/components/ui/tooltip'
+} from '@/src/shared/components/ui/tooltip'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -267,7 +267,7 @@ function SidebarTrigger({
       variant="ghost"
       size="icon"
       className={cn('size-7', className)}
-      onClick={(event) => {
+      onClick={(event: any) => {
         onClick?.(event)
         toggleSidebar()
       }}

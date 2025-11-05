@@ -10,6 +10,7 @@ import { Label } from "@/src/shared/components/ui/label"
 import { Textarea } from "@/src/shared/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/shared/components/ui/select"
 import { Calculator, FileText, Phone } from "lucide-react"
+import { sendMailAction } from "@/src/shared/functions/mailer"
 
 export function QuoteSection() {
   const [formData, setFormData] = useState({
@@ -29,7 +30,7 @@ export function QuoteSection() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
+    sendMailAction(formData)
     // Aquí iría la lógica para enviar el formulario
     alert("¡Cotización enviada! Nos pondremos en contacto contigo pronto.")
   }
@@ -195,7 +196,7 @@ export function QuoteSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Email</h4>
-                  <p className="text-muted-foreground">info@tallermendez.com</p>
+                  <p className="text-muted-foreground">ventas@karbu.com.mx</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Horarios</h4>
@@ -203,8 +204,8 @@ export function QuoteSection() {
                     Lun - Vie: 8:00 AM - 6:00 PM
                     <br />
                     Sáb: 9:00 AM - 2:00 PM
-                    <br />
-                    Dom: Emergencias 24/7
+                    {/* <br />
+                    Dom: Emergencias 24/7 */}
                   </p>
                 </div>
               </CardContent>

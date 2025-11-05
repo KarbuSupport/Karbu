@@ -1,125 +1,114 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/src/shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
-import { Input } from "@/src/shared/components/ui/input"
-import { Label } from "@/src/shared/components/ui/label"
-import { Textarea } from "@/src/shared/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/shared/components/ui/select"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/src/shared/components/ui/dialog"
 import { Plus, FileText, DollarSign, Calendar } from "lucide-react"
+import { QuoteFormModal } from "@/src/features/admin/quotes/components/quotes-form-modal"
+import { QuotesTable } from "@/src/features/admin/quotes/components/quotes-table"
+import { getAllQuotesAction, getQuotesStatsAction } from "@/src/features/admin/quotes/quotes.actions"
+import type { QuoteWithRelations } from "@/src/shared/types/quote"
 
 export function QuotesManagement() {
-  const [isNewQuoteOpen, setIsNewQuoteOpen] = useState(false)
+  const [quotes, setQuotes] = useState<QuoteWithRelations[]>([])
+  const [stats, setStats] = useState({ total: 0, withPurchaseCheck: 0, totalEstimate: 0 })
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEdit, setIsEdit] = useState(false);
+  const [selectedQuote, setSelectedQuote] = useState<QuoteWithRelations | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const loadData = async () => {
+    setIsLoading(true)
+    try {
+      const [quotesResult, statsResult] = await Promise.all([getAllQuotesAction(), getQuotesStatsAction()])
+
+      if (quotesResult.success) {
+        setQuotes(quotesResult.data as any)
+      }
+      if (statsResult.success) {
+        setStats(statsResult.data as any)
+      }
+    } catch (error) {
+      console.error("Error loading data:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const handleEdit = (quote: QuoteWithRelations) => {
+    setSelectedQuote(quote)
+    setIsModalOpen(true)
+    setIsEdit(true);
+  }
+
+  const handleCreate = () => {
+    setIsModalOpen(true);
+    setIsEdit(false);
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setSelectedQuote(null)
+    setIsEdit(false);
+  }
+
+  const handleSuccess = () => {
+    loadData()
+  }
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN",
+    }).format(amount)
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Gestión de Cotizaciones</h1>
           <p className="text-muted-foreground">Administra todas las cotizaciones de servicios</p>
         </div>
-        <Dialog open={isNewQuoteOpen} onOpenChange={setIsNewQuoteOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
-              <Plus className="w-4 h-4 mr-2" />
-              Nueva Cotización
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Crear Nueva Cotización</DialogTitle>
-              <DialogDescription>Ingresa los datos para generar una cotización</DialogDescription>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="client-name">Nombre del Cliente</Label>
-                <Input id="client-name" placeholder="Roberto Silva" />
-              </div>
-              <div>
-                <Label htmlFor="client-email">Correo Electrónico</Label>
-                <Input id="client-email" type="email" placeholder="roberto@email.com" />
-              </div>
-              <div>
-                <Label htmlFor="client-phone">Teléfono</Label>
-                <Input id="client-phone" placeholder="555-0123" />
-              </div>
-              <div>
-                <Label htmlFor="vehicle">Vehículo</Label>
-                <Input id="vehicle" placeholder="Honda Civic 2020" />
-              </div>
-              <div>
-                <Label htmlFor="service">Tipo de Servicio</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar servicio" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="seguro-completo">Seguro Completo</SelectItem>
-                    <SelectItem value="reparacion-motor">Reparación Motor</SelectItem>
-                    <SelectItem value="mantenimiento">Mantenimiento</SelectItem>
-                    <SelectItem value="pintura">Pintura y Carrocería</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="amount">Monto Estimado</Label>
-                <Input id="amount" type="number" placeholder="2500" />
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="description">Descripción del Servicio</Label>
-                <Textarea id="description" placeholder="Detalles adicionales del servicio..." />
-              </div>
-              <div className="col-span-2 flex gap-2">
-                <Button onClick={() => setIsNewQuoteOpen(false)} variant="outline" className="flex-1">
-                  Cancelar
-                </Button>
-                <Button onClick={() => setIsNewQuoteOpen(false)} className="flex-1 bg-accent hover:bg-accent/90">
-                  Crear Cotización
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => setIsModalOpen(true)} className="bg-accent hover:bg-accent/90">
+          <Plus className="w-4 h-4 mr-2" />
+          Nueva Cotización
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cotizaciones Pendientes</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Cotizaciones</CardTitle>
             <FileText className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">+2 desde ayer</p>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground">Cotizaciones registradas</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cotizaciones Aprobadas</CardTitle>
+            <CardTitle className="text-sm font-medium">Chequeo Compra-Venta</CardTitle>
             <DollarSign className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">+1 desde ayer</p>
+            <div className="text-2xl font-bold">{stats.withPurchaseCheck}</div>
+            <p className="text-xs text-muted-foreground">Con chequeo de compra-venta</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Total Mes</CardTitle>
+            <CardTitle className="text-sm font-medium">Valor Total Estimado</CardTitle>
             <Calendar className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,200</div>
-            <p className="text-xs text-muted-foreground">+12% vs mes anterior</p>
+            <div className="text-2xl font-bold">{formatCurrency(Number(stats.totalEstimate))}</div>
+            <p className="text-xs text-muted-foreground">Suma de presupuestos</p>
           </CardContent>
         </Card>
       </div>
@@ -129,9 +118,21 @@ export function QuotesManagement() {
           <CardTitle>Lista de Cotizaciones</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Tabla de cotizaciones pendiente de implementar...</p>
+          {isLoading ? (
+            <p className="text-center text-muted-foreground py-8">Cargando cotizaciones...</p>
+          ) : (
+            <QuotesTable quotes={quotes} onEdit={handleEdit} onRefresh={loadData} />
+          )}
         </CardContent>
       </Card>
+
+      <QuoteFormModal
+        open={isModalOpen}
+        onOpenChange={handleModalClose}
+        quote={selectedQuote}
+        onSuccess={handleSuccess}
+        isEdit={isEdit}
+      />
     </div>
   )
 }

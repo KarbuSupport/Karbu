@@ -4,8 +4,8 @@ import { Users, Award, Clock, MapPin } from "lucide-react"
 const stats = [
   { icon: Users, number: "5,000+", label: "Clientes Satisfechos" },
   { icon: Award, number: "20+", label: "Años de Experiencia" },
-  { icon: Clock, number: "24/7", label: "Servicio de Emergencia" },
-  { icon: MapPin, number: "3", label: "Sucursales en CDMX" },
+  { icon: Clock, number: "Servicio", label: "Lunes a viernes: 8:00 AM - 6:00 PM" },
+  { icon: MapPin, number: "1", label: "Sucursal en Guadalajara Jalisco, México" },
 ]
 
 export function AboutSection() {

@@ -2,31 +2,43 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/src/shared/components/ui/button"
-import { ChevronLeft, ChevronRight, Shield, Wrench, Clock } from "lucide-react"
+import { ChevronLeft, ChevronRight, Shield, Wrench, Clock, Car } from "lucide-react"
 
 const slides = [
   {
-    title: "Seguros de Reparación Automotriz",
-    subtitle: "Protege tu inversión con nuestros seguros especializados",
-    description: "Cobertura completa para reparaciones mecánicas, eléctricas y de carrocería.",
+    title: "Chequeo Preventivo Bimestral",
+    subtitle: "Mantén tu vehículo en óptimas condiciones",
+    description:
+      "Realizamos inspecciones bimestrales para detectar a tiempo posibles fallas y garantizar el máximo rendimiento de tu vehículo, evitando gastos innecesarios a futuro.",
     icon: Shield,
-    cta: "Cotizar Seguro",
+    cta: "Solicitar Evaluación",
   },
   {
     title: "Servicio Técnico Especializado",
     subtitle: "Más de 20 años de experiencia en el sector automotriz",
-    description: "Diagnóstico preciso y reparaciones de calidad con garantía extendida.",
+    description:
+      "Contamos con técnicos certificados y equipamiento de última generación para ofrecer diagnósticos precisos y reparaciones con garantía extendida.",
     icon: Wrench,
-    cta: "Ver Servicios",
+    cta: "Explorar Servicios",
   },
   {
-    title: "Atención 24/7",
-    subtitle: "Servicio de emergencia las 24 horas del día",
-    description: "Asistencia inmediata para situaciones de emergencia en carretera.",
+    title: "Atención Personalizada con Cita",
+    subtitle: "Comodidad y atención prioritaria",
+    description:
+      "Agenda tu cita y recibe atención inmediata de nuestros especialistas sin esperas. Servicio eficiente, puntual y enfocado en tus necesidades.",
     icon: Clock,
-    cta: "Llamar Ahora",
+    cta: "Agendar Cita",
+  },
+  {
+    title: "Seguro de Reparación Automotriz",
+    subtitle: "Protege tu inversión con total tranquilidad",
+    description:
+      "Contrata nuestro seguro de reparación y recibe cobertura ante imprevistos mecánicos o eléctricos. Garantía, asistencia y respaldo profesional en todo momento.",
+    icon: Car,
+    cta: "Cotizar Seguro",
   },
 ]
+
 
 export function HeroCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -34,7 +46,7 @@ export function HeroCarousel() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 7000) // 7 Segundos
+    }, 10000) // 10 Segundos
     return () => clearInterval(timer)
   }, [])
 
@@ -66,16 +78,9 @@ export function HeroCarousel() {
                   <p className="text-xl lg:text-2xl mb-6 text-secondary-foreground/80">{slide.subtitle}</p>
                   <p className="text-lg mb-8 text-secondary-foreground/70 max-w-2xl">{slide.description}</p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                    <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    {/* <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                       {slide.cta}
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="border-secondary-foreground text-secondary-foreground hover:bg-secondary-foreground hover:text-secondary bg-transparent"
-                    >
-                      Más Información
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
                 <div className="flex-1">
