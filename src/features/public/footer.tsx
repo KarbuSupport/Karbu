@@ -92,9 +92,9 @@ export function Footer() {
               <div className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <span className="text-sm">
-                  Av. Insurgentes Sur 1234,
+                  C. Rita Pérez de Moreno 815
                   <br />
-                  Col. Del Valle, CDMX 03100
+                  Santa María, 44719 Guadalajara, Jal.
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -103,7 +103,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm">info@tallermendez.com</span>
+                <span className="text-sm">ventas@karbu.com.mx</span>
               </div>
               <div className="flex items-start gap-2">
                 <Clock className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />

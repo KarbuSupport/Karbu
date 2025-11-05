@@ -29,7 +29,6 @@ export async function getQuoteByIdAction(id: number) {
 
 export async function createQuoteAction(data: QuoteFormData) {
   try {
-  console.log('data :', data);
     const quote = await QuoteService.createQuote(data)
     revalidatePath("/quotes")
     return { success: true, data: quote }

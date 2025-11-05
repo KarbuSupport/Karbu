@@ -19,6 +19,7 @@ import {
 import { ContractFormModal } from "./contract-form-modal"
 import { ContractViewModal } from "./contract-view-modal"
 import { downloadContractPDF } from "@/src/lib/contract-pdf-generator"
+import { generateQrImg, generateQrWithId } from "@/src/lib/generateQr"
 
 interface Contract {
   id: number
@@ -101,21 +102,26 @@ export function ContractsManagement() {
     }
   }
 
-const handleStatusNames = (name: string): string => {
-  const statusNames: Record<string, string> = {
-    CurrentAndPaid: "Al corriente y pagado",
-    CurrentAndInDebt: "Al corriente y con deuda",
-    Expired: "Vencido",
-  }
+  const handleStatusNames = (name: string): string => {
+    const statusNames: Record<string, string> = {
+      CurrentAndPaid: "Vigente y pagado",
+      CurrentAndInDebt: "Al corriente y con deuda",
+      Expired: "Vencido",
+    }
 
-  return statusNames[name] ?? "Desconocido"
-}
+    return statusNames[name] ?? "Desconocido"
+  }
 
 
   const handleCreateContract = async (data: any) => {
     setIsSubmitting(true)
     try {
-      const result = await createContractAction(data)
+      const { qrId } = await generateQrWithId("CTN")
+      const contractDataWithQr = {
+        ...data,
+        qrCode: qrId,
+      }
+      const result = await createContractAction(contractDataWithQr)
       if (result.success) {
         setIsFormOpen(false)
         setEditingContract(null)
@@ -178,6 +184,19 @@ const handleStatusNames = (name: string): string => {
     setIsFormOpen(true)
   }
 
+  async function handleDownloadContract(contract: any) {
+  let contractWithQr = { ...contract }
+
+  // Si tiene qrId pero no qrCode, generamos QR
+  if (contract.qrCode) {
+    const { qrBase64 } = await generateQrImg(contract.qrCode)
+    contractWithQr.qrCode = qrBase64.replace(/^data:image\/png;base64,/, "")
+    // contractWithQr.qrCode = qrBase64
+  }
+
+  downloadContractPDF(contractWithQr)
+}
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -220,7 +239,7 @@ const handleStatusNames = (name: string): string => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Caducados</CardTitle>
+            <CardTitle className="text-sm font-medium">Vencidos</CardTitle>
             <AlertTriangle className="w-4 h-4 text-red-500" />
           </CardHeader>
           <CardContent>
@@ -241,9 +260,9 @@ const handleStatusNames = (name: string): string => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos</SelectItem>
-                    <SelectItem value="CurrentAndPaid" >Vigente y pagado</SelectItem>
-                    <SelectItem value="CurrentAndInDebt">Vigente y con deuda</SelectItem>
-                    <SelectItem value="Expired">Caducado</SelectItem>
+                  <SelectItem value="CurrentAndPaid" >Vigente y pagado</SelectItem>
+                  <SelectItem value="CurrentAndInDebt">Vigente y con deuda</SelectItem>
+                  <SelectItem value="Expired">Vencido</SelectItem>
                 </SelectContent>
               </Select>
               <Input
@@ -334,7 +353,7 @@ const handleStatusNames = (name: string): string => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => downloadContractPDF(contract as any)}
+                            onClick={() => handleDownloadContract(contract as any)}
                             title="Descargar PDF"
                           >
                             <Download className="w-4 h-4" />

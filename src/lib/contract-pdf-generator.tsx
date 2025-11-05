@@ -1,6 +1,7 @@
 "use client"
 
 import jsPDF from "jspdf"
+import { generateQrImg } from "./generateQr"
 
 interface ContractData {
   id: number
@@ -113,8 +114,9 @@ export function generateContractPDF(contract: ContractData) {
 
   // QR Code
   if (contract.qrCode) {
-    doc.setFontSize(10)
-    doc.text(`Código QR: ${contract.qrCode}`, 25, yPosition)
+    // ⚡ Espera a generar el QR si es necesario
+    const qrBase64Clean = contract.qrCode.replace(/^data:image\/png;base64,/, "")
+    doc.addImage(qrBase64Clean, "PNG", 150, yPosition - 10, 40, 40)
   }
 
   // Footer
@@ -126,7 +128,20 @@ export function generateContractPDF(contract: ContractData) {
   return doc
 }
 
-export function downloadContractPDF(contract: ContractData) {
-  const doc = generateContractPDF(contract)
+export async function downloadContractPDF(contract: ContractData) {
+  let contractWithQr = { ...contract }
+
+  // Generar QR si tenemos un ID
+  if (contract.qrCode) {
+    const { qrBase64 } = await generateQrImg(contract.qrCode)
+    contractWithQr.qrCode = qrBase64 // ⚡ mantener el prefijo 'data:image/png;base64,'
+  }
+
+  // Limpiar prefijo antes de agregar al PDF
+  if (contractWithQr.qrCode) {
+    contractWithQr.qrCode = contractWithQr.qrCode.replace(/^data:image\/png;base64,/, "")
+  }
+
+  const doc = await generateContractPDF(contractWithQr)
   doc.save(`Contrato-${contract.id}.pdf`)
 }

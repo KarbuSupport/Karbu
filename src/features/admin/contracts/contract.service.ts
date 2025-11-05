@@ -68,10 +68,15 @@ export class ContractService {
       }
 
       if (filters?.search) {
+        const searchNumber = Number(filters.search.replace(/^CNT-/, ""))
         where.OR = [
           { clientName: { contains: filters.search, mode: "insensitive" } },
           { vehicle: { licensePlate: { contains: filters.search, mode: "insensitive" } } },
         ]
+        if (!isNaN(searchNumber)) {
+          // Si search es número o "CNT-<número>", agregar filtro por ID
+          where.OR.push({ id: searchNumber })
+        }
       }
 
       const contracts = await prisma.contract.findMany({
@@ -164,11 +169,11 @@ export class ContractService {
           status: data.status,
           services: data.services
             ? {
-                create: data.services.map((s) => ({
-                  serviceId: s.serviceId,
-                  price: new Prisma.Decimal(s.price),
-                })),
-              }
+              create: data.services.map((s) => ({
+                serviceId: s.serviceId,
+                price: new Prisma.Decimal(s.price),
+              })),
+            }
             : undefined,
         },
         include: {

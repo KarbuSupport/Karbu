@@ -54,6 +54,7 @@ export function PaymentsManagement() {
   const [isNewPaymentOpen, setIsNewPaymentOpen] = useState(false)
   const [payments, setPayments] = useState<Payment[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [formData, setFormData] = useState({
     contractId: "",
@@ -122,9 +123,7 @@ export function PaymentsManagement() {
 
   const todayPayments = payments.filter((p) => {
     const paymentDate = new Date(p.paymentDate)
-    console.log('paymentDate :', paymentDate);
     const today = new Date()
-    console.log('today :', today);
     return paymentDate.toDateString() === today.toDateString()
   }).length
 

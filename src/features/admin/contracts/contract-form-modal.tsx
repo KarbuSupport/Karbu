@@ -145,7 +145,7 @@ export function ContractFormModal({
                   <SelectContent>
                     <SelectItem value="CurrentAndPaid" >Vigente y pagado</SelectItem>
                     <SelectItem value="CurrentAndInDebt">Vigente y con deuda</SelectItem>
-                    <SelectItem value="Expired">Caducado</SelectItem>
+                    <SelectItem value="Expired">Vencido</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

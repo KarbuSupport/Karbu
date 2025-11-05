@@ -64,41 +64,41 @@ export function QRSearch() {
         }
     }
 
- const handleUpdateContract = async (data: any) => {
-  if (!qrSearchResult) return
+    const handleUpdateContract = async (data: any) => {
+        if (!qrSearchResult) return
 
-  setIsLoading(true)
-  try {
-    const result = await updateContractAction(
-        qrSearchResult.id,
-        {...data},
-    )
-    
-    if (result.success) {
-      toast({
-        title: "Contrato actualizado",
-        description: "Los cambios se guardaron correctamente",
-      })
-      setIsModalOpen(false)
-      setQrSearchResult(result.data)
-    } else {
-      toast({
-        title: "Error",
-        description: result.error || "No se pudo actualizar el contrato",
-        variant: "destructive",
-      })
+        setIsLoading(true)
+        try {
+            const result = await updateContractAction(
+                qrSearchResult.id,
+                { ...data },
+            )
+
+            if (result.success) {
+                toast({
+                    title: "Contrato actualizado",
+                    description: "Los cambios se guardaron correctamente",
+                })
+                setIsModalOpen(false)
+                setQrSearchResult(result.data)
+            } else {
+                toast({
+                    title: "Error",
+                    description: result.error || "No se pudo actualizar el contrato",
+                    variant: "destructive",
+                })
+            }
+        } catch (error) {
+            console.error("Error updating contract:", error)
+            toast({
+                title: "Error inesperado",
+                description: "Ocurrió un problema al actualizar el contrato",
+                variant: "destructive",
+            })
+        } finally {
+            setIsLoading(false)
+        }
     }
-  } catch (error) {
-    console.error("Error updating contract:", error)
-    toast({
-      title: "Error inesperado",
-      description: "Ocurrió un problema al actualizar el contrato",
-      variant: "destructive",
-    })
-  } finally {
-    setIsLoading(false)
-  }
-}
 
 
     const searchContractByQRCode = async (qrCode: string) => {
@@ -171,7 +171,6 @@ export function QRSearch() {
                     qrbox: { width: 250, height: 250 },
                 },
                 (decodedText: string) => {
-                    console.log("[v0] QR detected:", decodedText)
                     html5QrCode.stop()
                     setIsScanning(false)
                     searchContractByQRCode(decodedText)
@@ -193,24 +192,31 @@ export function QRSearch() {
     }
 
     const stopScanner = async () => {
-        if (qrScannerInstanceRef.current) {
+        const scanner = qrScannerInstanceRef.current
+        if (scanner) {
             try {
-                await qrScannerInstanceRef.current.stop()
-                qrScannerInstanceRef.current = null
+                // Solo detiene si el escáner realmente está corriendo
+                if (scanner.getState && scanner.getState() === 2) { // 2 = SCANNING
+                    await scanner.stop()
+                }
             } catch (err) {
-                console.error("[v0] Error stopping scanner:", err)
+                console.warn("[QR] No se pudo detener el escáner o ya estaba detenido:", err)
+            } finally {
+                qrScannerInstanceRef.current = null
+                setIsScanning(false)
             }
         }
-        setIsScanning(false)
     }
 
+    // Cleanup al desmontar
     useEffect(() => {
         return () => {
             if (qrScannerInstanceRef.current) {
-                qrScannerInstanceRef.current.stop().catch(() => { })
+                stopScanner()
             }
         }
     }, [])
+
 
     return (
         <div className="space-y-6">
@@ -304,23 +310,26 @@ export function QRSearch() {
             )}
 
             {/* Contract Modals */}
-            {selectedAction === "ver" && qrSearchResult && (
-                <ContractViewModal
-                    open={isModalOpen}
-                    onOpenChange={setIsModalOpen}
-                    contract={qrSearchResult}
-                />
-            )}
+            <ContractViewModal
+                open={isModalOpen && selectedAction === "ver"}
+                onOpenChange={(open) => {
+                    if (!open) setSelectedAction(null)
+                    setIsModalOpen(open)
+                }}
+                contract={qrSearchResult}
+            />
 
-            {selectedAction === "editar" && qrSearchResult && (
-                <ContractFormModal
-                    open={isModalOpen}
-                    onOpenChange={setIsModalOpen}
-                    onSubmit={(data) => handleUpdateContract(data)} // ✅ función correcta
-                    initialData={qrSearchResult}
-                    isLoading={isLoading}
-                />
-            )}
+            <ContractFormModal
+                open={isModalOpen && selectedAction === "editar"}
+                onOpenChange={(open) => {
+                    if (!open) setSelectedAction(null)
+                    setIsModalOpen(open)
+                }}
+                onSubmit={(data) => handleUpdateContract(data)}
+                initialData={qrSearchResult}
+                isLoading={isLoading}
+            />
+
 
             <ModalOpcionesContrato
                 isOpen={open}

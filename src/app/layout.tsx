@@ -9,7 +9,7 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "Karbu - Sistema de Gestión",
   description: "Sistema de gestión para taller mecánico Karbu - Tu mecánico de confianza",
-  generator: "v0.app",
+  generator: "",
 }
 
 export default function RootLayout({

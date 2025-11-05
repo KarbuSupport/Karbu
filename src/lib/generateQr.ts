@@ -6,16 +6,27 @@ import { nanoid } from "nanoid"
  * @param baseUrl URL base que recibirá el ID (por ejemplo, "https://miapp.com/scan")
  * @returns { id, qrBase64 }
  */
-export async function generateQrWithId(baseUrl: string) {
+export async function generateQrWithId(typeQR: string) {
   try {
     // 1️⃣ Generar ID único
     const id = nanoid(12) // Ejemplo: "J4ewr465n-hyg5"
 
     // 2️⃣ Crear URL completa con el identificador
-    const qrUrl = `${baseUrl}?id=${id}`
+    const qrId = `${typeQR}-${id}`
 
-    // 3️⃣ Generar QR en base64 (para insertar en PDF)
-    const qrBase64 = await QRCode.toDataURL(qrUrl, {
+    // 3️⃣ Retornar ID 
+    return { qrId }
+  } catch (error) {
+    console.error("Error generando QR:", error)
+    throw new Error("No se pudo generar el código QR")
+  }
+}
+
+export async function generateQrImg(qrId: string) {
+  try {
+    // Generar QR en base64 (para insertar en PDF)
+    const qrBase64 = await QRCode.toDataURL(qrId, {
+      type: "image/png",
       errorCorrectionLevel: "H",
       margin: 1,
       scale: 6,
@@ -25,8 +36,7 @@ export async function generateQrWithId(baseUrl: string) {
       },
     })
 
-    // 4️⃣ Retornar ID + imagen
-    return { id, qrBase64 }
+    return { qrBase64 };
   } catch (error) {
     console.error("Error generando QR:", error)
     throw new Error("No se pudo generar el código QR")

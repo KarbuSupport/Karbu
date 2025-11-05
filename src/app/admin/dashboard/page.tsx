@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { AdminLayout } from "@/src/features/admin/layout/admin-layout"
 import { DashboardOverview } from "@/src/features/admin/dashboard/dashboard-overview"
 import { QuotesManagement } from "@/src/features/admin/quotes/quotes-management"
@@ -13,7 +12,6 @@ import { QRSearch } from "@/src/features/admin/qr-search/qr-search"
 
 export default function AdminPage() {
   const { permissions } = useAuth()
-  const router = useRouter()
   const [activeSection, setActiveSection] = useState("dashboard")
 
   const sectionPermissions: Record<string, string> = {
@@ -45,11 +43,11 @@ export default function AdminPage() {
       case "quotes":
         return <QuotesManagement />
       case "contracts":
-        return <ContractsManagement/>
+        return <ContractsManagement />
       case "payments":
-        return <PaymentsManagement/>
+        return <PaymentsManagement />
       case "qr-search":
-        return <QRSearch/>
+        return <QRSearch />
       case "user-management":
         return <RolesManagement />
       default:

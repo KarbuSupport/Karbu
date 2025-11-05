@@ -63,7 +63,7 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
                   variant={
                     contract.status === "Vigente"
                       ? "default"
-                      : contract.status === "Caducado"
+                      : contract.status === "Vencido"
                         ? "destructive"
                         : "secondary"
                   }

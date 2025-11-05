@@ -53,8 +53,6 @@ export function AdminLayout({ children, activeSection, onSectionChange }: AdminL
     }
   }
 
-
-
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
@@ -119,16 +117,12 @@ export function AdminLayout({ children, activeSection, onSectionChange }: AdminL
             <Menu className="w-4 h-4" />
           </Button>
 
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input placeholder="Buscar contratos, usuarios..." className="pl-10 w-64" />
-            </div>
+          {/* <div className="flex items-center space-x-4"> */}
             {/* Type of logged-in user */}
-            <Badge variant="secondary" className="bg-accent text-accent-foreground">
+            {/* <Badge variant="secondary" className="bg-accent text-accent-foreground">
               Admin
             </Badge>
-          </div>
+          </div> */}
         </header>
 
         {/* Content */}
