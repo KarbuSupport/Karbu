@@ -91,7 +91,7 @@ export function QuoteSection() {
                         id="phone"
                         value={formData.phone}
                         onChange={(e) => handleInputChange("phone", e.target.value)}
-                        placeholder="+52 (555) 123-4567"
+                        placeholder="+52 33-36-51-35-04"
                         required
                       />
                     </div>
@@ -146,15 +146,39 @@ export function QuoteSection() {
                       <SelectTrigger>
                         <SelectValue placeholder="Selecciona el servicio" />
                       </SelectTrigger>
+
                       <SelectContent>
+                        
+                        {/* Garantías y Seguros */}
                         <SelectItem value="seguro-reparacion">Seguro de Reparación</SelectItem>
-                        <SelectItem value="mecanica-general">Mecánica General</SelectItem>
+
+                        {/* Servicios Básicos */}
+                        <SelectItem value="mantenimiento-basico">Mantenimiento Básico (aceite, filtros, bujías)</SelectItem>
+                        <SelectItem value="mantenimiento-preventivo">Mantenimiento Preventivo (limpiezas y ajustes)</SelectItem>
+                        <SelectItem value="diagnostico-electronico">Diagnóstico y Escaneo Electrónico</SelectItem>
+
+                        {/* Mantenimiento Avanzado */}
+                        <SelectItem value="sistema-combustible">Servicio al Sistema de Combustible (inyectores, MAF, cuerpo de aceleración)</SelectItem>
+                        <SelectItem value="sistema-enfriamiento">Servicio al Sistema de Enfriamiento</SelectItem>
+                        <SelectItem value="sistema-frenos">Servicio de Frenos</SelectItem>
+                        <SelectItem value="suspension-direccion">Suspensión y Dirección</SelectItem>
+
+                        {/* Mecánica General */}
+                        <SelectItem value="mecanica-general">Mecánica General (motor, transmisión, fugas)</SelectItem>
                         <SelectItem value="sistema-electrico">Sistema Eléctrico</SelectItem>
-                        <SelectItem value="hojalateria-pintura">Hojalatería y Pintura</SelectItem>
-                        <SelectItem value="mantenimiento">Mantenimiento Preventivo</SelectItem>
-                        <SelectItem value="especializado">Servicio Especializado</SelectItem>
+
+                        {/* Inspecciones */}
+                        <SelectItem value="inspeccion-general">Inspección General del Vehículo</SelectItem>
+                        <SelectItem value="revision-previaje">Revisión Previaje / Precompra</SelectItem>
+
+                        {/* Servicios Especiales */}
+                        <SelectItem value="verificacion-vehicular">Preparación para Verificación</SelectItem>
+                        <SelectItem value="instalacion-accesorios">Instalación de Accesorios</SelectItem>
+
                       </SelectContent>
                     </Select>
+
+
                   </div>
 
                   <div>
@@ -188,11 +212,11 @@ export function QuoteSection() {
               <CardContent className="space-y-4">
                 <div>
                   <h4 className="font-semibold mb-2">Teléfono Principal</h4>
-                  <p className="text-muted-foreground">+52 (555) 123-4567</p>
+                  <p className="text-muted-foreground">+52 33-36-51-35-04</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">WhatsApp</h4>
-                  <p className="text-muted-foreground">+52 (555) 765-4321</p>
+                  <p className="text-muted-foreground">+52 33-18-10-68-33</p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Email</h4>
@@ -201,11 +225,11 @@ export function QuoteSection() {
                 <div>
                   <h4 className="font-semibold mb-2">Horarios</h4>
                   <p className="text-muted-foreground">
-                    Lun - Vie: 8:00 AM - 6:00 PM
+                    Lun - Vie: 10:00 AM - 3:00 PM y 3:30 PM - 7:00 PM
                     <br />
-                    Sáb: 9:00 AM - 2:00 PM
-                    {/* <br />
-                    Dom: Emergencias 24/7 */}
+                    Sáb: 9:30 AM - 3:00 PM
+                    <br />
+                    Dom: Cerrado
                   </p>
                 </div>
               </CardContent>

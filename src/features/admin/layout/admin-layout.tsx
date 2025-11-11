@@ -2,15 +2,12 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/src/shared/components/ui/button"
-import { Input } from "@/src/shared/components/ui/input"
-import { Badge } from "@/src/shared/components/ui/badge"
 import {
   Car,
   Menu,
   X,
-  Search,
   LayoutDashboard,
   FileText,
   LucideContrast as FileContract,

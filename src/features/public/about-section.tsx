@@ -4,8 +4,8 @@ import { Users, Award, Clock, MapPin } from "lucide-react"
 const stats = [
   { icon: Users, number: "5,000+", label: "Clientes Satisfechos" },
   { icon: Award, number: "20+", label: "Años de Experiencia" },
-  { icon: Clock, number: "Servicio", label: "Lunes a viernes: 8:00 AM - 6:00 PM" },
-  { icon: MapPin, number: "1", label: "Sucursal en Guadalajara Jalisco, México" },
+  { icon: Clock, number: "Servicio", label: "Lun - Vie: 10:00 AM - 3:00 PM y 3:30 PM - 7:00 PM \n Sáb: 9:30 AM - 3:00 PM \n Dom: Cerrado" },
+  { icon: MapPin, number: "1", label: "Sucursal en C. Rita Pérez de Moreno 815, Santa María, 44719 Guadalajara, Jal." },
 ]
 
 export function AboutSection() {
@@ -49,7 +49,7 @@ export function AboutSection() {
                   <CardContent className="p-6 text-center">
                     <stat.icon className="h-8 w-8 text-primary mx-auto mb-2" />
                     <div className="text-2xl font-bold text-foreground">{stat.number}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                    <div className="text-sm text-muted-foreground whitespace-pre-line">{stat.label}</div>
                   </CardContent>
                 </Card>
               ))}

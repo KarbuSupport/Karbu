@@ -14,15 +14,15 @@ export function Footer() {
               Más de 20 años brindando servicios automotrices de calidad con seguros especializados que protegen tu
               inversión.
             </p>
-            <div className="flex space-x-4">
-              <Facebook className="h-5 w-5 text-secondary-foreground/60 hover:text-primary cursor-pointer transition-colors" />
-              <Instagram className="h-5 w-5 text-secondary-foreground/60 hover:text-primary cursor-pointer transition-colors" />
-              <Twitter className="h-5 w-5 text-secondary-foreground/60 hover:text-primary cursor-pointer transition-colors" />
-            </div>
+            {/* <div className="flex space-x-4"> */}
+            {/* <Facebook className="h-5 w-5 text-secondary-foreground/60 hover:text-primary cursor-pointer transition-colors" /> */}
+            {/* <Instagram className="h-5 w-5 text-secondary-foreground/60 hover:text-primary cursor-pointer transition-colors" /> */}
+            {/* <Twitter className="h-5 w-5 text-secondary-foreground/60 hover:text-primary cursor-pointer transition-colors" /> */}
+            {/* </div> */}
           </div>
 
           {/* Servicios */}
-          <div>
+          {/* <div>
             <h4 className="text-lg font-semibold mb-4">Servicios</h4>
             <ul className="space-y-2 text-secondary-foreground/80">
               <li>
@@ -51,7 +51,7 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-          </div>
+          </div> */}
 
           {/* Enlaces rápidos */}
           <div>
@@ -99,7 +99,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm">+52 (555) 123-4567</span>
+                <span className="text-sm">+52 33-36-51-35-04</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-5 w-5 text-primary flex-shrink-0" />
@@ -108,9 +108,11 @@ export function Footer() {
               <div className="flex items-start gap-2">
                 <Clock className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <span className="text-sm">
-                  Lun - Vie: 8:00 AM - 6:00 PM
+                  Lun - Vie: 10:00 AM - 3:00 PM y 3:30 PM - 7:00 PM
                   <br />
-                  Sáb: 9:00 AM - 2:00 PM
+                  Sáb: 9:30 AM - 3:00 PM
+                  <br />
+                  Dom: Cerrado
                 </span>
               </div>
             </div>
