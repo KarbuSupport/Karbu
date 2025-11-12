@@ -7,8 +7,8 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Karbu - Sistema de Gestión",
-  description: "Sistema de gestión para taller mecánico Karbu - Tu mecánico de confianza",
+  title: "Karbu - Tu mecánico de confianza",
+  description: "Karbu - Tu mecánico de confianza",
   generator: "",
 }
 
