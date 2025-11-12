@@ -23,7 +23,7 @@ export function Header() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
               <Phone className="h-4 w-4 text-primary" />
-              <span>+52 (555) 123-4567</span>
+              <span>+52 33-36-51-35-04</span>
             </div>
             <div className="flex items-center gap-1">
               <MapPin className="h-4 w-4 text-primary" />
@@ -31,7 +31,7 @@ export function Header() {
 
             </div>
           </div>
-          <div className="hidden md:block text-muted-foreground">Lunes a Viernes: 8:00 AM - 6:00 PM</div>
+          <div className="hidden md:block text-muted-foreground">Lun - Vie: 10:00 AM - 3:00 PM y 3:30 PM - 7:00 PM <br /> Sáb: 9:30 AM - 3:00 PM  Dom: Cerrado</div>
         </div>
 
         {/* Main navigation */}
@@ -56,7 +56,24 @@ export function Header() {
           </nav>
 
           <div className="hidden md:block">
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Contactar Ahora</Button>
+            {/* <a
+              href="mailto:ventas@karbu.com.mx?subject=Solicitud%20de%20información&body=Hola%2C%20quiero%20recibir%20más%20información%20sobre%20sus%20servicios."
+              className="inline-block"
+            >
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                Contactar Ahora
+              </Button>
+            </a> */}
+                          <a
+                href="https://wa.me/523318106833?text=Hola%2C%20quisiera%20más%20información%20sobre%20sus%20servicios."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full block"
+              >
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full mt-4">
+                  Contactar por WhatsApp
+                </Button>
+              </a>
           </div>
 
           {/* Mobile menu button */}
@@ -79,9 +96,16 @@ export function Header() {
                   {item.name}
                 </a>
               ))}
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full mt-4">
-                Contactar Ahora
-              </Button>
+              <a
+                href="https://wa.me/523318106833?text=Hola%2C%20quisiera%20más%20información%20sobre%20sus%20servicios."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full block"
+              >
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full mt-4">
+                  Contactar por WhatsApp
+                </Button>
+              </a>
             </div>
           </nav>
         )}

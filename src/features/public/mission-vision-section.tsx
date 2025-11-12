@@ -25,9 +25,10 @@ export function MissionVisionSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-pretty">
-                Brindar servicios automotrices de excelencia con seguros especializados que protejan la inversión de
-                nuestros clientes, utilizando tecnología de punta y un equipo humano altamente capacitado para superar
-                las expectativas en cada servicio.
+                Karbu es una empresa dedicada a dar soluciones de servicios automotrices de calidad
+                de manera eficaz y eficiente en cualquier punto donde se encuentren propietarios
+                de vehículos automotores por medio de plataformas digitales, tenemos el propósito
+                de desarrollar tecnologías necesarias para su buen manejo siempre dirigido a la mejora continua.
               </p>
             </CardContent>
           </Card>
@@ -41,9 +42,10 @@ export function MissionVisionSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-pretty">
-                Ser reconocidos como el taller automotriz líder en México, expandiendo nuestros servicios a nivel
-                nacional y estableciendo el estándar de calidad en reparaciones automotrices respaldadas por seguros
-                especializados.
+                Ser una empresa consolidada y ampliamente reconocida en la rama automotriz
+                para que todos los propietarios de vehículos automotores cuenten con un servicio
+                de mantenimiento preventivo, correctivo y asistencia vial de calidad de forma inteligente
+                certera y autentica en cualquier parte de México.
               </p>
             </CardContent>
           </Card>
@@ -63,19 +65,27 @@ export function MissionVisionSection() {
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span>Excelencia en el servicio</span>
+                  <span>Certeza</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span>Compromiso con la calidad</span>
+                  <span>Puntualidad</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span>Innovación tecnológica</span>
+                  <span>Calidad</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span>Responsabilidad social</span>
+                  <span>Responsabilidad</span>
+                </li>
+                 <li className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full" />
+                  <span>Pasión</span>
+                </li>
+                 <li className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full" />
+                  <span>Respeto</span>
                 </li>
               </ul>
             </CardContent>

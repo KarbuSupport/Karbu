@@ -140,16 +140,28 @@ export function generateQuotePDF(formData: QuoteFormData, quoteId: string) {
 
   // 🧰 Servicios
   sectionTitle("Servicios requeridos")
-  const services = [
-    { key: "oilChange", label: "Cambio de Aceite y Filtro" },
-    { key: "tuneUp", label: "Afinación Completa" },
-    { key: "airFilterChange", label: "Cambio de Filtro de Aire" },
-    { key: "fuelFilterChange", label: "Cambio de Filtro de Gasolina" },
-    { key: "throttleBodyCleaning", label: "Lavado de Garganta" },
-    { key: "iacValveCleaning", label: "Lavado de Válvula IAC" },
-    { key: "mafSensorCleaning", label: "Limpieza de Sensor MAF" },
-    { key: "injectorCleaning", label: "Lavado de Inyectores" },
-  ]
+const services = [
+  { key: "mantenimientoBasico", label: "Mantenimiento Básico (aceite, filtros, bujías)" },
+  { key: "mantenimientoPreventivo", label: "Mantenimiento Preventivo (limpiezas y ajustes)" },
+  { key: "diagnosticoElectronico", label: "Diagnóstico y Escaneo Electrónico" },
+
+  { key: "sistemaCombustible", label: "Servicio al Sistema de Combustible (inyectores, MAF, cuerpo de aceleración)" },
+  { key: "sistemaEnfriamiento", label: "Servicio al Sistema de Enfriamiento" },
+  { key: "sistemaFrenos", label: "Servicio de Frenos" },
+  { key: "suspensionDireccion", label: "Suspensión y Dirección" },
+
+  { key: "mecanicaGeneral", label: "Mecánica General (motor, transmisión, fugas)" },
+  { key: "sistemaElectrico", label: "Sistema Eléctrico" },
+
+  { key: "inspeccionGeneral", label: "Inspección General del Vehículo" },
+  { key: "revisionPreviaje", label: "Revisión Previaje / Precompra" },
+
+  { key: "verificacionVehicular", label: "Preparación para Verificación" },
+  { key: "instalacionAccesorios", label: "Instalación de Accesorios" },
+
+  { key: "seguroReparacion", label: "Seguro de Reparación" }
+];
+
   const selected = services.filter((s) => formData.vehicleService?.[s.key as keyof typeof formData.vehicleService])
   const serviceRows: string[][] = []
   for (let i = 0; i < selected.length; i += 2)
