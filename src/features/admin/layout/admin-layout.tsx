@@ -61,7 +61,11 @@ export function AdminLayout({ children, activeSection, onSectionChange }: AdminL
             <Car className="w-8 h-8 text-accent" />
             <span className="text-xl font-bold">Karbu.com.mx</span>
           </div>
-          <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(false)}>
+          <Button
+          variant="ghost"
+          size="sm"
+          className="lg:hidden hover:cursor-pointer"
+          onClick={() => setSidebarOpen(false)}>
             <X className="w-4 h-4" />
           </Button>
         </div>
@@ -110,7 +114,11 @@ export function AdminLayout({ children, activeSection, onSectionChange }: AdminL
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6">
-          <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+          <Button
+          variant="ghost"
+          size="sm"
+          className="lg:hidden hover:cursor-pointer"
+          onClick={() => setSidebarOpen(true)}>
             <Menu className="w-4 h-4" />
           </Button>
 

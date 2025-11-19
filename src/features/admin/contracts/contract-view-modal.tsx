@@ -6,6 +6,7 @@ import { Badge } from "@/src/shared/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
 import { Download, X } from "lucide-react"
 import { downloadContractPDF } from "@/src/lib/contract-pdf-generator"
+import { QrViewer } from "@/src/shared/hooks/QrViewer"
 
 interface ContractViewModalProps {
   contract: any
@@ -14,6 +15,7 @@ interface ContractViewModalProps {
 }
 
 export function ContractViewModal({ contract, open, onOpenChange }: ContractViewModalProps) {
+  console.log('contract :', contract);
   if (!contract) return null
 
   const totalPrice =
@@ -22,20 +24,13 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
       return sum + price
     }, 0) || 0
 
-  const handleStatusNames = async (name: string): Promise<string> => {
-    enum PaymentStatus {
-      CurrentAndPaid = "CurrentAndPaid",
-      CurrentAndInDebt = "CurrentAndInDebt",
-      Expired = "Expired",
+  const handleStatusNames = (name: string): string => {
+    const statusNames: Record<string, string> = {
+      CurrentAndPaid: "Al corriente y pagado",
+      CurrentAndInDebt: "Al corriente y con deuda",
+      Expired: "Vencido",
     }
-
-    const statusNames: Record<PaymentStatus, string> = {
-      [PaymentStatus.CurrentAndPaid]: "Al corriente y pagado",
-      [PaymentStatus.CurrentAndInDebt]: "Al corriente y con deuda",
-      [PaymentStatus.Expired]: "Vencido",
-    }
-
-    return statusNames[name as PaymentStatus] || "Desconocido"
+    return statusNames[name] || "Desconocido"
   }
 
   return (
@@ -47,6 +42,19 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Responsable */}
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Responsable</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 gap-2">
+              <div>
+                {/* <p className="text-sm text-muted-foreground">Responsable</p> */}
+                <p className="font-medium">
+                  {contract.responsible?.firstName} {contract.responsible?.lastName1} {contract.responsible?.lastName2}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Client Info */}
           <Card>
             <CardHeader>
@@ -72,14 +80,90 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
                 </Badge>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Responsable</p>
-                <p className="font-medium">
-                  {contract.responsible?.firstName} {contract.responsible?.lastName1}
-                </p>
+                <p className="text-sm text-muted-foreground">RFC</p>
+                <p className="font-medium">{contract.clientRFC}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Client Direction */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Dirección del Cliente</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Calle</p>
+                <p className="font-medium">{contract.clientStreet}</p>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Número Exterior</p>
+                  <p className="font-medium">{contract.clientExteriorNumber}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Número Interior</p>
+                  <p className="font-medium">{contract.clientInteriorNumber}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Código Postal</p>
+                  <p className="font-medium">{contract.clientPostalCode}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Colonia</p>
+                  <p className="font-medium">{contract.clientNeighborhood}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Ciudad</p>
+                  <p className="font-medium">{contract.clientCity}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Estado</p>
+                  <p className="font-medium">{contract.clientState}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* PROFECO Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Información PROFECO</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Número de Registro PROFECO</p>
+                  <p className="font-medium">{contract.profecoNumber}</p>
+                </div>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-medium">{contract.responsible?.email}</p>
+                <p className="text-sm text-muted-foreground">Fecha de Registro PROFECO</p>
+                <p className="font-medium">{new Date(contract.profecoDate).toLocaleDateString("es-ES")}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Consentimientos */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Consentimientos</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="p-4 border rounded-xl bg-muted/30 flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    Autorización para uso de datos mercadotécnicos
+                  </p>
+                  <span className="text-lg">{contract.marketingConsent ? "✅" : "❌"}</span>
+                </div>
+
+                <div className="p-4 border rounded-xl bg-muted/30 flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    Autorización para recibir publicidad
+                  </p>
+                  <span className="text-lg">{contract.advertisingConsent ? "✅" : "❌"}</span>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -154,23 +238,21 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
 
           {/* QR Code */}
           {contract.qrCode && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Código QR</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="font-mono text-sm">{contract.qrCode}</p>
-              </CardContent>
-            </Card>
+            <QrViewer qrId={contract.qrCode} />
           )}
 
           {/* Actions */}
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="hover:cursor-pointer">
               <X className="w-4 h-4 mr-2" />
               Cerrar
             </Button>
-            <Button onClick={() => downloadContractPDF(contract)}>
+            <Button
+            onClick={() => downloadContractPDF(contract)}
+            className="hover:cursor-pointer">
               <Download className="w-4 h-4 mr-2" />
               Descargar PDF
             </Button>

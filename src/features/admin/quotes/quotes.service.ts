@@ -13,7 +13,7 @@ export class QuoteService {
         vehicleChecks: true,
         vehicleServices: true,
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { id: "desc" },
     })
 
     if (!quotes) return []
@@ -62,11 +62,21 @@ export class QuoteService {
 
     // Clean objects
     const cleanedVehicleCheck = vehicleCheck
-      ? this.cleanObject(vehicleCheck)
+      ? this.cleanObject({
+        ...vehicleCheck,
+        id: undefined,
+        quoteId: undefined,
+      })
       : undefined
+
     const cleanedVehicleService = vehicleService
-      ? this.cleanObject(vehicleService)
+      ? this.cleanObject({
+        ...vehicleService,
+        id: undefined,
+        quoteId: undefined,
+      })
       : undefined
+
 
     // Ensure vehicle record exists
     let vehicleRecord
@@ -101,17 +111,17 @@ export class QuoteService {
         visibleDamages: quoteData.visibleDamages,
         vehicleChecks: cleanedVehicleCheck
           ? {
-              create: [
-                cleanedVehicleCheck as Prisma.VehicleCheckCreateWithoutQuoteInput,
-              ],
-            }
+            create: [
+              cleanedVehicleCheck as Prisma.VehicleCheckCreateWithoutQuoteInput,
+            ],
+          }
           : undefined,
         vehicleServices: cleanedVehicleService
           ? {
-              create: [
-                cleanedVehicleService as Prisma.VehicleServiceCreateWithoutQuoteInput,
-              ],
-            }
+            create: [
+              cleanedVehicleService as Prisma.VehicleServiceCreateWithoutQuoteInput,
+            ],
+          }
           : undefined,
       },
       include: {
@@ -144,6 +154,8 @@ export class QuoteService {
           engineType: vehicle.engineType,
           transmission: vehicle.transmission,
           licensePlate: vehicle.licensePlate,
+          engineNumber: vehicle.engineNumber,
+          vin: vehicle.vin,
         },
       })
     }
@@ -172,17 +184,17 @@ export class QuoteService {
         visibleDamages: quoteData.visibleDamages,
         vehicleChecks: cleanedVehicleCheck
           ? {
-              create: [
-                cleanedVehicleCheck as Prisma.VehicleCheckCreateWithoutQuoteInput,
-              ],
-            }
+            create: [
+              cleanedVehicleCheck as Prisma.VehicleCheckCreateWithoutQuoteInput,
+            ],
+          }
           : undefined,
         vehicleServices: cleanedVehicleService
           ? {
-              create: [
-                cleanedVehicleService as Prisma.VehicleServiceCreateWithoutQuoteInput,
-              ],
-            }
+            create: [
+              cleanedVehicleService as Prisma.VehicleServiceCreateWithoutQuoteInput,
+            ],
+          }
           : undefined,
       },
       include: {

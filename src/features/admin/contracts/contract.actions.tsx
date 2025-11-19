@@ -17,36 +17,6 @@ export async function getContractsAction(filters?: {
   }
 }
 
-export async function getContractsWithStatusAction(filters?: {
-  status?: string
-  search?: string
-  skip?: number
-  take?: number
-}) {
-  try {
-    const contracts = await ContractService.getContracts(filters)
-
-    // Inicializamos el objeto con todos los estados
-    const statusCount = {
-      CurrentAndPaid: 0,
-      CurrentAndInDebt: 0,
-      Expired: 0,
-    }
-
-    // Contamos los contratos por estado
-    contracts.forEach(contract => {
-      if (contract.status in statusCount) {
-        statusCount[contract.status as keyof typeof statusCount] += 1
-      }
-    })
-
-    return { success: true, data: statusCount }
-  } catch (error) {
-    console.error("Server action error:", error)
-    return { success: false, error: "Error fetching contracts" }
-  }
-}
-
 export async function getContractByIdAction(id: number) {
   try {
     const contract = await ContractService.getContractById(id)
@@ -66,6 +36,19 @@ export async function createContractAction(data: {
   status: string
   responsibleUser: number
   services: Array<{ serviceId: number; price: number }>
+  clientRFC?: string
+  clientStreet?: string
+  clientExteriorNumber?: string
+  clientInteriorNumber?: string
+  clientNeighborhood?: string
+  clientPostalCode?: string
+  clientCity?: string
+  clientState?: string
+  marketingConsent?: boolean
+  advertisingConsent?: boolean
+  profecoNumber?: string
+  profecoDate?: Date
+  qrCode?: string
 }) {
   try {
     const contract = await ContractService.createContract(data)
@@ -80,11 +63,23 @@ export async function updateContractAction(
   id: number,
   data: {
     clientName?: string
+    clientRFC?: string
+    clientStreet?: string
+    clientExteriorNumber?: string
+    clientInteriorNumber?: string
+    clientNeighborhood?: string
+    clientPostalCode?: string
+    clientCity?: string
+    clientState?: string
     vehicleId?: number
     quoteId?: number
     startDate?: Date
     endDate?: Date
     status?: string
+    marketingConsent?: boolean
+    advertisingConsent?: boolean
+    profecoNumber?: string
+    profecoDate?: Date
     services?: Array<{ serviceId: number; price: number }>
   },
 ) {
@@ -134,5 +129,33 @@ export async function getServicesAction() {
   } catch (error) {
     console.error("Server action error:", error)
     return { success: false, error: "Error fetching services" }
+  }
+}
+
+export async function getContractsWithStatusAction(filters?: {
+  search?: string
+  skip?: number
+  take?: number
+}) {
+  try {
+    const contracts = await ContractService.getContracts(filters)
+
+    // Group contracts by status
+    const grouped = contracts.reduce(
+      (acc, contract) => {
+        const status = contract.status || "Pendiente"
+        if (!acc[status]) {
+          acc[status] = []
+        }
+        acc[status].push(contract)
+        return acc
+      },
+      {} as Record<string, typeof contracts>,
+    )
+
+    return { success: true, data: grouped }
+  } catch (error) {
+    console.error("Server action error:", error)
+    return { success: false, error: "Error fetching contracts by status" }
   }
 }

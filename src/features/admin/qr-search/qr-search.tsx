@@ -249,7 +249,10 @@ export function QRSearch() {
                                     onKeyPress={(e) => e.key === "Enter" && handleManualSearch()}
                                     disabled={isLoading}
                                 />
-                                <Button onClick={handleManualSearch} disabled={isLoading} className="bg-accent hover:bg-accent/90">
+                                <Button
+                                onClick={handleManualSearch}
+                                disabled={isLoading}
+                                className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
                                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                                 </Button>
                             </div>
@@ -286,7 +289,7 @@ export function QRSearch() {
                             <Button
                                 onClick={isScanning ? stopScanner : startScanner}
                                 variant={isScanning ? "destructive" : "default"}
-                                className={!isScanning ? "bg-accent hover:bg-accent/90" : ""}
+                                className={!isScanning ? "bg-accent hover:bg-accent/90 hover:cursor-pointer" : ""}
                                 disabled={isLoading}
                             >
                                 {isScanning ? "Detener Escaneo" : "Iniciar Escaneo"}

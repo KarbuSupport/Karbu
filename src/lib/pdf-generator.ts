@@ -140,36 +140,48 @@ export function generateQuotePDF(formData: QuoteFormData, quoteId: string) {
 
   // 🧰 Servicios
   sectionTitle("Servicios requeridos")
-const services = [
-  { key: "mantenimientoBasico", label: "Mantenimiento Básico (aceite, filtros, bujías)" },
-  { key: "mantenimientoPreventivo", label: "Mantenimiento Preventivo (limpiezas y ajustes)" },
-  { key: "diagnosticoElectronico", label: "Diagnóstico y Escaneo Electrónico" },
+  const services = [
+    { key: "basicMaintenance", label: "Mantenimiento Básico (aceite, filtros, bujías)" },
+    { key: "preventiveMaintenance", label: "Mantenimiento Preventivo (limpiezas y ajustes)" },
+    { key: "electronicDiagnostics", label: "Diagnóstico y Escaneo Electrónico" },
 
-  { key: "sistemaCombustible", label: "Servicio al Sistema de Combustible (inyectores, MAF, cuerpo de aceleración)" },
-  { key: "sistemaEnfriamiento", label: "Servicio al Sistema de Enfriamiento" },
-  { key: "sistemaFrenos", label: "Servicio de Frenos" },
-  { key: "suspensionDireccion", label: "Suspensión y Dirección" },
+    { key: "fuelSystemService", label: "Servicio al Sistema de Combustible (inyectores, MAF, \n cuerpo de aceleración)" },
+    { key: "coolingSystemService", label: "Servicio al Sistema de Enfriamiento" },
+    { key: "brakeService", label: "Servicio de Frenos" },
+    { key: "suspensionAndSteering", label: "Suspensión y Dirección" },
 
-  { key: "mecanicaGeneral", label: "Mecánica General (motor, transmisión, fugas)" },
-  { key: "sistemaElectrico", label: "Sistema Eléctrico" },
+    { key: "generalMechanics", label: "Mecánica General (motor, transmisión, fugas)" },
+    { key: "electricalSystem", label: "Sistema Eléctrico" },
 
-  { key: "inspeccionGeneral", label: "Inspección General del Vehículo" },
-  { key: "revisionPreviaje", label: "Revisión Previaje / Precompra" },
+    { key: "generalInspection", label: "Inspección General del Vehículo" },
+    { key: "tripInspection", label: "Revisión Previaje / Precompra" },
 
-  { key: "verificacionVehicular", label: "Preparación para Verificación" },
-  { key: "instalacionAccesorios", label: "Instalación de Accesorios" },
+    { key: "emissionsPreparation", label: "Preparación para Verificación" },
+    { key: "accessoriesInstallation", label: "Instalación de Accesorios" },
 
-  { key: "seguroReparacion", label: "Seguro de Reparación" }
-];
+    { key: "repairInsurance", label: "Seguro de Reparación" }
+  ];
 
   const selected = services.filter((s) => formData.vehicleService?.[s.key as keyof typeof formData.vehicleService])
-  const serviceRows: string[][] = []
-  for (let i = 0; i < selected.length; i += 2)
+const serviceRows: string[][] = []
+
+for (let i = 0; i < selected.length; i += 2) {
+  const firstLines = (selected[i]?.label || "").split("\n")
+  const secondLines = (selected[i + 1]?.label || "").split("\n")
+
+  // Encontrar el mayor número de líneas para emparejar columnas
+  const maxLines = Math.max(firstLines.length, secondLines.length)
+
+  for (let j = 0; j < maxLines; j++) {
     serviceRows.push([
-      `- ${selected[i]?.label || ""}`,
-      selected[i + 1] ? `- ${selected[i + 1].label}` : "",
+      firstLines[j] ? `- ${firstLines[j]}` : "",
+      secondLines[j] ? `- ${secondLines[j]}` : "",
     ])
-  addDataBlock(serviceRows.length ? serviceRows : [["No se seleccionaron servicios", ""]])
+  }
+}
+
+// Luego lo pasas a tu función que genera el PDF
+addDataBlock(serviceRows.length ? serviceRows : [["No se seleccionaron servicios", ""]])
 
   // 💰 Presupuesto y observaciones
   sectionTitle("Presupuesto y observaciones")

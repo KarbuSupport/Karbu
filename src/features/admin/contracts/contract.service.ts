@@ -11,18 +11,43 @@ export class ContractService {
     status: string
     responsibleUser: number
     services: Array<{ serviceId: number; price: number }>
+    clientRFC?: string
+    clientStreet?: string
+    clientExteriorNumber?: string
+    clientInteriorNumber?: string
+    clientNeighborhood?: string
+    clientPostalCode?: string
+    clientCity?: string
+    clientState?: string
+    marketingConsent?: boolean
+    advertisingConsent?: boolean
+    profecoNumber?: string
+    profecoDate?: Date
+    qrCode?: string
   }) {
     try {
       const contract = await prisma.contract.create({
         data: {
           clientName: data.clientName,
+          clientRFC: data.clientRFC,
+          clientStreet: data.clientStreet,
+          clientExteriorNumber: data.clientExteriorNumber,
+          clientInteriorNumber: data.clientInteriorNumber,
+          clientNeighborhood: data.clientNeighborhood,
+          clientPostalCode: data.clientPostalCode,
+          clientCity: data.clientCity,
+          clientState: data.clientState,
           vehicleId: data.vehicleId,
           quoteId: data.quoteId,
           startDate: data.startDate,
           endDate: data.endDate,
           status: data.status,
           responsibleUser: data.responsibleUser,
-          qrCode: `QR${Date.now()}${Math.random().toString(36).substr(2, 9)}`,
+          marketingConsent: data.marketingConsent || false,
+          advertisingConsent: data.advertisingConsent || false,
+          profecoNumber: data.profecoNumber,
+          profecoDate: data.profecoDate,
+          qrCode: data.qrCode || `QR${Date.now()}${Math.random().toString(36).substr(2, 9)}`,
           services: {
             create: data.services.map((s) => ({
               serviceId: s.serviceId,
@@ -74,7 +99,6 @@ export class ContractService {
           { vehicle: { licensePlate: { contains: filters.search, mode: "insensitive" } } },
         ]
         if (!isNaN(searchNumber)) {
-          // Si search es número o "CNT-<número>", agregar filtro por ID
           where.OR.push({ id: searchNumber })
         }
       }
@@ -98,7 +122,7 @@ export class ContractService {
           },
           payments: true,
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { id: "desc" },
         skip: filters?.skip || 0,
         take: filters?.take || 10,
       })
@@ -143,11 +167,23 @@ export class ContractService {
     id: number,
     data: {
       clientName?: string
+      clientRFC?: string
+      clientStreet?: string
+      clientExteriorNumber?: string
+      clientInteriorNumber?: string
+      clientNeighborhood?: string
+      clientPostalCode?: string
+      clientCity?: string
+      clientState?: string
       vehicleId?: number
       quoteId?: number
       startDate?: Date
       endDate?: Date
       status?: string
+      marketingConsent?: boolean
+      advertisingConsent?: boolean
+      profecoNumber?: string
+      profecoDate?: Date
       services?: Array<{ serviceId: number; price: number }>
     },
   ) {
@@ -162,18 +198,30 @@ export class ContractService {
         where: { id },
         data: {
           clientName: data.clientName,
+          clientRFC: data.clientRFC,
+          clientStreet: data.clientStreet,
+          clientExteriorNumber: data.clientExteriorNumber,
+          clientInteriorNumber: data.clientInteriorNumber,
+          clientNeighborhood: data.clientNeighborhood,
+          clientPostalCode: data.clientPostalCode,
+          clientCity: data.clientCity,
+          clientState: data.clientState,
           vehicleId: data.vehicleId,
           quoteId: data.quoteId,
           startDate: data.startDate,
           endDate: data.endDate,
           status: data.status,
+          marketingConsent: data.marketingConsent,
+          advertisingConsent: data.advertisingConsent,
+          profecoNumber: data.profecoNumber,
+          profecoDate: data.profecoDate,
           services: data.services
             ? {
-              create: data.services.map((s) => ({
-                serviceId: s.serviceId,
-                price: new Prisma.Decimal(s.price),
-              })),
-            }
+                create: data.services.map((s) => ({
+                  serviceId: s.serviceId,
+                  price: new Prisma.Decimal(s.price),
+                })),
+              }
             : undefined,
         },
         include: {
@@ -226,13 +274,12 @@ export class ContractService {
         prisma.contract.count({ where: { status: "CurrentAndPaid" } }),
         prisma.contract.count({ where: { status: "CurrentAndInDebt" } }),
         prisma.contract.count({ where: { status: "Expired" } }),
-        // prisma.payment.count({ where: { contract: { status: "CurrentAndPaid" } } }),
       ])
 
       return {
         CurrentAndPaid,
         CurrentAndInDebt,
-        Expired
+        Expired,
       }
     } catch (error) {
       console.error("Error fetching contract stats:", error)
@@ -243,7 +290,7 @@ export class ContractService {
   static async getVehicles() {
     try {
       const vehicles = await prisma.vehicle.findMany({
-        orderBy: { brand: "asc" },
+        orderBy: { id: "asc" },
       })
       return vehicles
     } catch (error) {

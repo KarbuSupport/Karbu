@@ -4,9 +4,9 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/shared/components/ui/table"
 import { Button } from "@/src/shared/components/ui/button"
 import { Badge } from "@/src/shared/components/ui/badge"
-import { Pencil, Trash2 } from "lucide-react"
+import { Eye, Pencil, Trash2 } from "lucide-react"
 import type { QuoteWithRelations } from "@/src/shared/types/quote"
-import { deleteQuoteAction } from "@/src/features/admin/quotes/quotes.actions"
+import { deleteQuoteAction, getQuoteByIdAction } from "@/src/features/admin/quotes/quotes.actions"
 import { useToast } from "@/src/shared/hooks/use-toast"
 import {
   AlertDialog,
@@ -18,6 +18,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/src/shared/components/ui/alert-dialog"
+import { QuoteViewModal } from "./quote-view-modal"
+import { useAuth } from "@/src/shared/context/AuthContext"
+import { can } from "@/src/shared/functions/permissions"
 
 interface QuotesTableProps {
   quotes: QuoteWithRelations[]
@@ -27,8 +30,11 @@ interface QuotesTableProps {
 
 export function QuotesTable({ quotes, onEdit, onRefresh }: QuotesTableProps) {
   const { toast } = useToast()
+  const systemPermissions = useAuth().permissions;
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isViewOpen, setIsViewOpen] = useState(false)
+  const [selectedQuote, setSelectedQuote] = useState<QuoteWithRelations | null>(null)
 
   const handleDelete = async () => {
     if (!deleteId) return
@@ -58,6 +64,18 @@ export function QuotesTable({ quotes, onEdit, onRefresh }: QuotesTableProps) {
     } finally {
       setIsDeleting(false)
       setDeleteId(null)
+    }
+  }
+
+  const handleViewQuote = async (id: number) => {
+    try {
+      const result = await getQuoteByIdAction(id)
+      if (result.success) {
+        setSelectedQuote(result.data as any)
+        setIsViewOpen(true)
+      }
+    } catch (error) {
+      console.error("Error loading contract:", error)
     }
   }
 
@@ -103,7 +121,7 @@ export function QuotesTable({ quotes, onEdit, onRefresh }: QuotesTableProps) {
             ) : (
               quotes.map((quote) => (
                 <TableRow key={quote.id}>
-                  <TableCell className="font-medium">#{quote.id}</TableCell>
+                  <TableCell className="font-medium">QTZ-{quote.id}</TableCell>
                   <TableCell>
                     {quote.vehicle.brand} {quote.vehicle.model}
                   </TableCell>
@@ -127,12 +145,33 @@ export function QuotesTable({ quotes, onEdit, onRefresh }: QuotesTableProps) {
                   </TableCell>
                   <TableCell className="">
                     {/* <Actions> */}
-                        <Button variant="ghost" className="h-8 w-8 p-0" onClick={() => onEdit(quote)}>
-                          <Pencil className="" />
-                        </Button>
-                        <Button variant="ghost" className="h-8 w-8 p-0 text-destructive" onClick={() => setDeleteId(quote.id)}>
-                          <Trash2 className="" />
-                        </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewQuote(quote.id)}
+                      title="Ver detalles"
+                      className="hover:cursor-pointer"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    {can(systemPermissions, "Edit_Quotations") && (
+                      <Button
+                      variant="ghost"
+                      className="h-8 w-8 p-0 hover:cursor-pointer"
+                      onClick={() => onEdit(quote)}>
+                        <Pencil className="" />
+                      </Button>
+                      )
+                    }
+                    
+                    {can(systemPermissions, "Delete_Quotations") && (
+                      <Button
+                        variant="ghost"
+                        className="h-8 w-8 p-0 text-destructive hover:cursor-pointer"
+                        onClick={() => setDeleteId(quote.id)}
+                        >
+                      <Trash2 className="" />
+                    </Button>)}
                   </TableCell>
                 </TableRow>
               ))
@@ -158,6 +197,8 @@ export function QuotesTable({ quotes, onEdit, onRefresh }: QuotesTableProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <QuoteViewModal quote={selectedQuote} open={isViewOpen} onOpenChange={setIsViewOpen} />
     </>
   )
 }

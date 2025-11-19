@@ -10,7 +10,7 @@ export class UserService {
         include: {
           role: true,
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: "asc" },
       })
 
       return {

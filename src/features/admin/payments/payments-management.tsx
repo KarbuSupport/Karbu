@@ -16,12 +16,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/src/shared/components/ui/dialog"
-import { Plus, Receipt, TrendingUp, Clock, Search, Eye, Edit, Download } from "lucide-react"
+import { Plus, Receipt, TrendingUp, Clock, Search, Eye, Edit, Download, Trash2 } from 'lucide-react'
 import {
   getPaymentsAction,
   createPaymentAction,
   getContractsAvailableForPaymentAction,
+  getQuotesAvailableForPaymentAction,
+  updatePaymentAction,
+  deletePaymentAction,
 } from "@/src/features/admin/payments/payments.actions"
+import { useAuth } from "@/src/shared/context/AuthContext"
+import { can } from "@/src/shared/functions/permissions"
+import { PaymentViewReadOnly } from "@/src/features/admin/payments/PaymentViewReadOnly"
+import { PaymentEditModal } from "@/src/features/admin/payments/PaymentEditModal"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/src/shared/components/ui/alert-dialog"
 
 interface Payment {
   id: number
@@ -50,14 +66,30 @@ interface Contract {
   status: string
 }
 
+interface Quote {
+  id: number
+  repairEstimate: any
+}
+
 export function PaymentsManagement() {
+  const systemPermissions = useAuth().permissions;
   const [isNewPaymentOpen, setIsNewPaymentOpen] = useState(false)
   const [payments, setPayments] = useState<Payment[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])
+  const [quotes, setQuotes] = useState<Quote[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(true)
+
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
+  const [isViewOpen, setIsViewOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null)
+
   const [formData, setFormData] = useState({
+    paymentType: "contract", // "contract" or "quote"
     contractId: "",
+    quoteId: "",
     amount: "",
     method: "",
     paymentDate: "",
@@ -72,12 +104,14 @@ export function PaymentsManagement() {
   async function loadData() {
     try {
       setIsLoading(true)
-      const [paymentsData, contractsData] = await Promise.all([
+      const [paymentsData, contractsData, quotesData] = await Promise.all([
         getPaymentsAction(),
         getContractsAvailableForPaymentAction(),
+        getQuotesAvailableForPaymentAction(),
       ])
       setPayments(paymentsData)
       setContracts(contractsData)
+      setQuotes(quotesData)
     } catch (error) {
       console.error("Error loading data:", error)
     } finally {
@@ -86,7 +120,10 @@ export function PaymentsManagement() {
   }
 
   async function handleCreatePayment() {
-    if (!formData.contractId || !formData.amount || !formData.method || !formData.paymentDate) {
+    const isQuotePayment = formData.paymentType === "quote"
+    const relatedId = isQuotePayment ? formData.quoteId : formData.contractId
+
+    if (!relatedId || !formData.amount || !formData.method || !formData.paymentDate) {
       alert("Por favor completa todos los campos requeridos")
       return
     }
@@ -96,7 +133,8 @@ export function PaymentsManagement() {
 
     try {
       await createPaymentAction({
-        contractId: Number.parseInt(formData.contractId),
+        contractId: isQuotePayment ? undefined : Number.parseInt(formData.contractId),
+        quoteId: isQuotePayment ? Number.parseInt(formData.quoteId) : undefined,
         amount: Number.parseFloat(formData.amount),
         method: formData.method,
         paymentDate: fixedDate,
@@ -106,7 +144,9 @@ export function PaymentsManagement() {
 
       // Reset form and reload data
       setFormData({
+        paymentType: "contract",
         contractId: "",
+        quoteId: "",
         amount: "",
         method: "",
         paymentDate: "",
@@ -118,6 +158,37 @@ export function PaymentsManagement() {
     } catch (error) {
       console.error("Error creating payment:", error)
       alert("Error al registrar el pago")
+    }
+  }
+
+  async function handleEditPayment(data: {
+    id: number
+    amount: number
+    method: string
+    paymentDate: Date
+    voucherNumber?: string
+  }) {
+    try {
+      await updatePaymentAction(data)
+      setIsEditOpen(false)
+      setSelectedPayment(null)
+      await loadData()
+    } catch (error) {
+      console.error("Error updating payment:", error)
+      alert("Error al actualizar el pago")
+    }
+  }
+
+  async function handleDeletePayment(paymentId: number) {
+    try {
+      console.log("[v0] Deleting payment:", paymentId)
+      await deletePaymentAction(paymentId)
+      setIsDeleteConfirmOpen(false)
+      setPaymentToDelete(null)
+      await loadData()
+    } catch (error) {
+      console.error("Error deleting payment:", error)
+      alert("Error al eliminar el pago")
     }
   }
 
@@ -145,39 +216,78 @@ export function PaymentsManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Gestión de Pagos</h1>
-          <p className="text-muted-foreground">Registra y administra pagos de contratos</p>
+          <p className="text-muted-foreground">Registra y administra pagos de contratos y cotizaciones</p>
         </div>
         <Dialog open={isNewPaymentOpen} onOpenChange={setIsNewPaymentOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-accent hover:bg-accent/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Registrar Pago
-            </Button>
+            {can(systemPermissions, "Create_Payments") && (
+              <Button className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
+                <Plus className="w-4 h-4 mr-2" />
+                Registrar Pago
+              </Button>)}
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Registrar Nuevo Pago</DialogTitle>
-              <DialogDescription>Registra un pago para un contrato existente</DialogDescription>
+              <DialogDescription>Registra un pago para un contrato o cotización existente</DialogDescription>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="payment-contract">Contrato</Label>
+              <div className="col-span-2">
+                <Label htmlFor="payment-type">Tipo de Pago</Label>
                 <Select
-                  value={formData.contractId}
-                  onValueChange={(value) => setFormData({ ...formData, contractId: value })}
+                  value={formData.paymentType}
+                  onValueChange={(value) => setFormData({ ...formData, paymentType: value, contractId: "", quoteId: "" })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar contrato" />
+                    <SelectValue placeholder="Seleccionar tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    {contracts.map((contract) => (
-                      <SelectItem key={contract.id} value={contract.id.toString()}>
-                        {contract.id} - {contract.clientName}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="contract">Pago de Contrato</SelectItem>
+                    <SelectItem value="quote">Pago de Cotización</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
+              {formData.paymentType === "contract" ? (
+                <div className="col-span-2">
+                  <Label htmlFor="payment-contract">Contrato</Label>
+                  <Select
+                    value={formData.contractId}
+                    onValueChange={(value) => setFormData({ ...formData, contractId: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar contrato" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contracts.map((contract) => (
+                        <SelectItem key={contract.id} value={contract.id.toString()}>
+                          {contract.id} - {contract.clientName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="col-span-2">
+                  <Label htmlFor="payment-quote">Cotización</Label>
+                  <Select
+                    value={formData.quoteId}
+                    onValueChange={(value) => setFormData({ ...formData, quoteId: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar cotización" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {quotes.map((quote) => (
+                        <SelectItem className="hover:cursor-pointer" key={quote.id} value={quote.id.toString()}>
+                          Cotización {quote.id}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <div>
                 <Label htmlFor="payment-amount">Monto del Pago</Label>
                 <Input
@@ -230,10 +340,15 @@ export function PaymentsManagement() {
                 />
               </div>
               <div className="col-span-2 flex gap-2">
-                <Button onClick={() => setIsNewPaymentOpen(false)} variant="outline" className="flex-1">
+                <Button
+                  onClick={() => setIsNewPaymentOpen(false)}
+                  variant="outline"
+                  className="flex-1 hover:cursor-pointer">
                   Cancelar
                 </Button>
-                <Button onClick={handleCreatePayment} className="flex-1 bg-accent hover:bg-accent/90">
+                <Button
+                  onClick={handleCreatePayment}
+                  className="flex-1 bg-accent hover:bg-accent/90 hover:cursor-pointer">
                   Registrar Pago
                 </Button>
               </div>
@@ -290,8 +405,16 @@ export function PaymentsManagement() {
           <div className="flex items-center justify-between">
             <CardTitle>Historial de Pagos</CardTitle>
             <div className="flex items-center space-x-2">
-              <Input placeholder="Buscar pagos..." className="w-64" />
-              <Button variant="outline" size="sm">
+              <Input
+                placeholder="Buscar pagos..."
+                className="w-64"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="hover:cursor-pointer">
                 <Search className="w-4 h-4" />
               </Button>
             </div>
@@ -305,8 +428,8 @@ export function PaymentsManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead>ID Pago</TableHead>
-                  <TableHead>Contrato</TableHead>
-                  <TableHead>Cliente</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Contrato/Cotización</TableHead>
                   <TableHead>Monto</TableHead>
                   <TableHead>Método</TableHead>
                   <TableHead>Fecha</TableHead>
@@ -330,8 +453,16 @@ export function PaymentsManagement() {
                           <p className="text-sm text-muted-foreground">{payment.voucherNumber || "N/A"}</p>
                         </div>
                       </TableCell>
-                      <TableCell>{payment.contractId || "N/A"}</TableCell>
-                      <TableCell>{payment.contract?.clientName || "N/A"}</TableCell>
+                      <TableCell>
+                        <span className={`text-xs font-medium px-2 py-1 rounded ${
+                          payment.contractId 
+                            ? "bg-blue-100 text-blue-700" 
+                            : "bg-green-100 text-green-700"
+                        }`}>
+                          {payment.contractId ? "Contrato" : "Cotización"}
+                        </span>
+                      </TableCell>
+                      <TableCell>{payment.contractId ? `CNT-${payment.contractId}` : `COT-${payment.quoteId}`}</TableCell>
                       <TableCell className="font-medium">
                         $
                         {typeof payment.amount === "number"
@@ -347,15 +478,50 @@ export function PaymentsManagement() {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="hover:cursor-pointer"
+                            onClick={() => {
+                              setSelectedPayment(payment)
+                              setIsViewOpen(true)
+                            }}>
                             <Eye className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          {/* <Button
+                            variant="ghost"
+                            size="sm"
+                            className="hover:cursor-pointer">
                             <Download className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Edit className="w-4 h-4" />
-                          </Button>
+                          </Button> */}
+                          {
+                            can(systemPermissions, "Edit_Payments") && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="hover:cursor-pointer"
+                                onClick={() => {
+                                  setSelectedPayment(payment)
+                                  setIsEditOpen(true)
+                                }}>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            )
+                          }
+                          {
+                            can(systemPermissions, "Delete_Payments") && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="hover:cursor-pointer text-red-500 hover:text-red-700"
+                                onClick={() => {
+                                  setPaymentToDelete(payment)
+                                  setIsDeleteConfirmOpen(true)
+                                }}>
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )
+                          }
                         </div>
                       </TableCell>
                     </TableRow>
@@ -366,6 +532,55 @@ export function PaymentsManagement() {
           )}
         </CardContent>
       </Card>
+
+      {selectedPayment && (
+        <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Ver Detalles del Pago</DialogTitle>
+            </DialogHeader>
+            <PaymentViewReadOnly payment={selectedPayment} />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {selectedPayment && (
+        <PaymentEditModal
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+          payment={selectedPayment}
+          onSuccess={loadData}
+          onSubmit={handleEditPayment}
+        />
+      )}
+
+      <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar Pago</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que deseas eliminar el pago PAY-{paymentToDelete?.id}?
+              <br />
+              Monto: ${typeof paymentToDelete?.amount === "number"
+                ? paymentToDelete.amount.toLocaleString()
+                : Number.parseFloat(paymentToDelete?.amount || "0").toLocaleString()}
+              <br />
+              <span className="text-red-500 font-semibold mt-2 block">Esta acción no se puede deshacer.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-4">
+            <AlertDialogCancel className="flex-1 hover:cursor-pointer">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => paymentToDelete && handleDeletePayment(paymentToDelete.id)}
+              className="flex-1 bg-red-500 hover:bg-red-600 hover:cursor-pointer"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -48,6 +48,8 @@ CREATE TABLE "public"."Vehicle" (
     "engineType" TEXT NOT NULL,
     "transmission" TEXT NOT NULL,
     "licensePlate" TEXT,
+    "engineNumber" TEXT,
+    "vin" TEXT,
 
     CONSTRAINT "Vehicle_pkey" PRIMARY KEY ("id")
 );
@@ -66,12 +68,25 @@ CREATE TABLE "public"."Service" (
 CREATE TABLE "public"."Contract" (
     "id" SERIAL NOT NULL,
     "clientName" TEXT NOT NULL,
+    "clientRFC" TEXT,
+    "clientStreet" TEXT,
+    "clientExteriorNumber" TEXT,
+    "clientInteriorNumber" TEXT,
+    "clientNeighborhood" TEXT,
+    "clientPostalCode" TEXT,
+    "clientCity" TEXT,
+    "clientState" TEXT DEFAULT 'Jalisco',
+    "marketingConsent" BOOLEAN,
+    "advertisingConsent" BOOLEAN,
+    "profecoNumber" TEXT,
+    "profecoDate" TIMESTAMP(3),
+    "clientSignature" TEXT,
     "vehicleId" INTEGER NOT NULL,
     "quoteId" INTEGER,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3),
     "status" TEXT NOT NULL,
-    "qrCode" TEXT,
+    "qrCode" TEXT NOT NULL,
     "responsibleUser" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -166,14 +181,20 @@ CREATE TABLE "public"."VehicleCheck" (
 CREATE TABLE "public"."VehicleService" (
     "id" SERIAL NOT NULL,
     "quoteId" INTEGER NOT NULL,
-    "oilChange" BOOLEAN NOT NULL,
-    "tuneUp" BOOLEAN NOT NULL,
-    "airFilterChange" BOOLEAN NOT NULL,
-    "fuelFilterChange" BOOLEAN NOT NULL,
-    "throttleBodyCleaning" BOOLEAN NOT NULL,
-    "iacValveCleaning" BOOLEAN NOT NULL,
-    "mafSensorCleaning" BOOLEAN NOT NULL,
-    "injectorCleaning" BOOLEAN NOT NULL,
+    "basicMaintenance" BOOLEAN NOT NULL,
+    "preventiveMaintenance" BOOLEAN NOT NULL,
+    "electronicDiagnostics" BOOLEAN NOT NULL,
+    "fuelSystemService" BOOLEAN NOT NULL,
+    "coolingSystemService" BOOLEAN NOT NULL,
+    "brakeService" BOOLEAN NOT NULL,
+    "suspensionAndSteering" BOOLEAN NOT NULL,
+    "generalMechanics" BOOLEAN NOT NULL,
+    "electricalSystem" BOOLEAN NOT NULL,
+    "generalInspection" BOOLEAN NOT NULL,
+    "tripInspection" BOOLEAN NOT NULL,
+    "emissionsPreparation" BOOLEAN NOT NULL,
+    "accessoriesInstallation" BOOLEAN NOT NULL,
+    "repairInsurance" BOOLEAN NOT NULL,
 
     CONSTRAINT "VehicleService_pkey" PRIMARY KEY ("id")
 );
@@ -185,7 +206,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
 CREATE UNIQUE INDEX "RolePermission_roleId_permissionId_key" ON "public"."RolePermission"("roleId", "permissionId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Vehicle_licensePlate_key" ON "public"."Vehicle"("licensePlate");
+CREATE UNIQUE INDEX "Contract_qrCode_key" ON "public"."Contract"("qrCode");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ContractService_contractId_serviceId_key" ON "public"."ContractService"("contractId", "serviceId");

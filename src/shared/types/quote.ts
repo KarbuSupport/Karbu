@@ -6,6 +6,8 @@ export interface VehicleData {
   engineType: string
   transmission: string
   licensePlate?: string
+  engineNumber?: string
+  vin?: string
 }
 
 export interface VehicleCheckData {
@@ -48,14 +50,20 @@ export interface VehicleCheckData {
 
 
 export interface VehicleServiceData {
-  oilChange: boolean
-  tuneUp: boolean
-  airFilterChange: boolean
-  fuelFilterChange: boolean
-  throttleBodyCleaning: boolean
-  iacValveCleaning: boolean
-  mafSensorCleaning: boolean
-  injectorCleaning: boolean
+basicMaintenance: boolean
+preventiveMaintenance: boolean
+electronicDiagnostics: boolean
+fuelSystemService: boolean
+coolingSystemService: boolean
+brakeService: boolean
+suspensionAndSteering: boolean
+generalMechanics: boolean
+electricalSystem: boolean
+generalInspection: boolean
+tripInspection: boolean
+emissionsPreparation: boolean
+accessoriesInstallation: boolean
+repairInsurance: boolean
 }
 
 export interface QuoteFormData {
@@ -88,6 +96,8 @@ export interface QuoteWithRelations {
     engineType: string
     transmission: string
     licensePlate: string | null
+    engineNumber: string | null
+    vin: string | null
   }
   vehicleChecks: VehicleCheckData[]
   vehicleServices: VehicleServiceData[]

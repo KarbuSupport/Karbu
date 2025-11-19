@@ -61,8 +61,8 @@ async function main() {
   const saltRounds = 10
 
   const adminPassword = await bcrypt.hash("adminHector", saltRounds)
-  const techPassword = await bcrypt.hash("tech123", saltRounds)
-  const receptionPassword = await bcrypt.hash("reception123", saltRounds)
+  // const techPassword = await bcrypt.hash("tech123", saltRounds)
+  // const receptionPassword = await bcrypt.hash("reception123", saltRounds)
 
 
   const adminUser = await prisma.user.create({

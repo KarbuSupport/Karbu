@@ -12,7 +12,6 @@ import { Checkbox } from "@/src/shared/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/src/shared/components/ui/radio-group"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/src/shared/components/ui/dialog"
 import { ScrollArea } from "@/src/shared/components/ui/scroll-area"
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/shared/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
 import { createQuoteAction, updateQuoteAction } from "@/src/features/admin/quotes/quotes.actions"
 import type { QuoteFormData, QuoteWithRelations } from "@/src/shared/types/quote"
@@ -52,6 +51,8 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
           engineType: quote.vehicle.engineType,
           transmission: quote.vehicle.transmission,
           licensePlate: quote.vehicle.licensePlate || "",
+          engineNumber: quote.vehicle.engineNumber || "",
+          vin: quote.vehicle.vin || "",
         },
         generalNotes: quote.generalNotes || "",
         repairEstimate: quote.repairEstimate ? Number(quote.repairEstimate) : 0,
@@ -61,14 +62,20 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
         visibleDamages: quote.visibleDamages || "",
         vehicleCheck: quote.vehicleChecks[0] || {},
         vehicleService: quote.vehicleServices[0] || {
-          oilChange: false,
-          tuneUp: false,
-          airFilterChange: false,
-          fuelFilterChange: false,
-          throttleBodyCleaning: false,
-          iacValveCleaning: false,
-          mafSensorCleaning: false,
-          injectorCleaning: false,
+          basicMaintenance: false,
+          preventiveMaintenance: false,
+          electronicDiagnostics: false,
+          fuelSystemService: false,
+          coolingSystemService: false,
+          brakeService: false,
+          suspensionAndSteering: false,
+          generalMechanics: false,
+          electricalSystem: false,
+          generalInspection: false,
+          tripInspection: false,
+          emissionsPreparation: false,
+          accessoriesInstallation: false,
+          repairInsurance: false
         },
       })
     }
@@ -287,6 +294,45 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
                         <SelectItem value="cvt">CVT</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="engineNumber" className="text-sm font-semibold">
+                      Número de Motor
+                    </Label>
+                    <Input
+                      id="engineNumber"
+                      type="text"
+                      placeholder="Ej: PJ12345U123456 - CAXA"
+                      className="h-11"
+                      value={formData.vehicle.engineNumber}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          vehicle: { ...formData.vehicle, engineNumber: e.target.value },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="vin" className="text-sm font-semibold">
+                      Número de Serie (NIV o VIN)
+                    </Label>
+                    <Input
+                      id="vin"
+                      type="text"
+                      placeholder="Ej: 1HGCM45869F123456"
+                      className="h-11"
+                      value={formData.vehicle.vin}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          vehicle: { ...formData.vehicle, vin: e.target.value },
+                        })
+                      }
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -1170,20 +1216,20 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {[
-                    { id: "mantenimientoBasico", label: "Mantenimiento Básico (aceite, filtros, bujías)" },
-                    { id: "mantenimientoPreventivo", label: "Mantenimiento Preventivo (limpiezas y ajustes)" },
-                    { id: "diagnosticoElectronico", label: "Diagnóstico y Escaneo Electrónico" },
-                    { id: "sistemaCombustible", label: "Servicio al Sistema de Combustible (inyectores, MAF, cuerpo de aceleración)" },
-                    { id: "sistemaEnfriamiento", label: "Servicio al Sistema de Enfriamiento" },
-                    { id: "sistemaFrenos", label: "Servicio de Frenos" },
-                    { id: "suspensionDireccion", label: "Suspensión y Dirección" },
-                    { id: "mecanicaGeneral", label: "Mecánica General (motor, transmisión, fugas)" },
-                    { id: "sistemaElectrico", label: "Sistema Eléctrico" },
-                    { id: "inspeccionGeneral", label: "Inspección General del Vehículo" },
-                    { id: "revisionPreviaje", label: "Revisión Previaje / Precompra" },
-                    { id: "verificacionVehicular", label: "Preparación para Verificación" },
-                    { id: "instalacionAccesorios", label: "Instalación de Accesorios" },
-                    { id: "seguroReparacion", label: "Seguro de Reparación" }
+                    { id: "basicMaintenance", label: "Mantenimiento Básico (aceite, filtros, bujías)" },
+                    { id: "preventiveMaintenance", label: "Mantenimiento Preventivo (limpiezas y ajustes)" },
+                    { id: "electronicDiagnostics", label: "Diagnóstico y Escaneo Electrónico" },
+                    { id: "fuelSystemService", label: "Servicio al Sistema de Combustible (inyectores, MAF, cuerpo de aceleración)" },
+                    { id: "coolingSystemService", label: "Servicio al Sistema de Enfriamiento" },
+                    { id: "brakeService", label: "Servicio de Frenos" },
+                    { id: "suspensionAndSteering", label: "Suspensión y Dirección" },
+                    { id: "generalMechanics", label: "Mecánica General (motor, transmisión, fugas)" },
+                    { id: "electricalSystem", label: "Sistema Eléctrico" },
+                    { id: "generalInspection", label: "Inspección General del Vehículo" },
+                    { id: "tripInspection", label: "Revisión Previaje / Precompra" },
+                    { id: "emissionsPreparation", label: "Preparación para Verificación" },
+                    { id: "accessoriesInstallation", label: "Instalación de Accesorios" },
+                    { id: "repairInsurance", label: "Seguro de Reparación" }
                   ].map((service) => (
                     <div
                       key={service.id}
@@ -1315,26 +1361,29 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="flex-1 h-11 cursor-pointer"
+              className="flex-1 h-11 hover:cursor-pointer"
               disabled={isSubmitting}
             >
               Cancelar
             </Button>
 
-            {(savedQuoteId || isEdit) && (
+            {/* {(savedQuoteId || isEdit) && (
               <Button
                 type="button"
                 variant="secondary"
                 onClick={handleGeneratePDF}
-                className="flex-1 h-11 cursor-pointer"
+                className="flex-1 h-11 hover:cursor-pointer"
                 disabled={isSubmitting}
               >
                 <FileText className="mr-2 h-4 w-4" />
                 Generar PDF
               </Button>
-            )}
+            )} */}
 
-            <Button type="submit" disabled={isSubmitting} className="flex-1 h-11 cursor-pointer">
+            <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="flex-1 h-11 hover:cursor-pointer">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
