@@ -150,30 +150,30 @@ export function QuoteSection() {
                       <SelectContent>
                         
                         {/* Garantías y Seguros */}
-                        <SelectItem value="seguro-reparacion">Seguro de Reparación</SelectItem>
+                        <SelectItem value="repairInsurance">Seguro de Reparación</SelectItem>
 
                         {/* Servicios Básicos */}
-                        <SelectItem value="mantenimiento-basico">Mantenimiento Básico (aceite, filtros, bujías)</SelectItem>
-                        <SelectItem value="mantenimiento-preventivo">Mantenimiento Preventivo (limpiezas y ajustes)</SelectItem>
-                        <SelectItem value="diagnostico-electronico">Diagnóstico y Escaneo Electrónico</SelectItem>
+                        <SelectItem value="basicMaintenance">Mantenimiento Básico (aceite, filtros, bujías)</SelectItem>
+                        <SelectItem value="preventiveMaintenance">Mantenimiento Preventivo (limpiezas y ajustes)</SelectItem>
+                        <SelectItem value="electronicDiagnostics">Diagnóstico y Escaneo Electrónico</SelectItem>
 
                         {/* Mantenimiento Avanzado */}
-                        <SelectItem value="sistema-combustible">Servicio al Sistema de Combustible (inyectores, MAF, cuerpo de aceleración)</SelectItem>
-                        <SelectItem value="sistema-enfriamiento">Servicio al Sistema de Enfriamiento</SelectItem>
-                        <SelectItem value="sistema-frenos">Servicio de Frenos</SelectItem>
-                        <SelectItem value="suspension-direccion">Suspensión y Dirección</SelectItem>
+                        <SelectItem value="fuelSystemService">Servicio al Sistema de Combustible (inyectores, MAF, cuerpo de aceleración)</SelectItem>
+                        <SelectItem value="coolingSystemService">Servicio al Sistema de Enfriamiento</SelectItem>
+                        <SelectItem value="brakeService">Servicio de Frenos</SelectItem>
+                        <SelectItem value="suspensionAndSteering">Suspensión y Dirección</SelectItem>
 
                         {/* Mecánica General */}
-                        <SelectItem value="mecanica-general">Mecánica General (motor, transmisión, fugas)</SelectItem>
-                        <SelectItem value="sistema-electrico">Sistema Eléctrico</SelectItem>
+                        <SelectItem value="generalMechanics">Mecánica General (motor, transmisión, fugas)</SelectItem>
+                        <SelectItem value="electricalSystem">Sistema Eléctrico</SelectItem>
 
                         {/* Inspecciones */}
-                        <SelectItem value="inspeccion-general">Inspección General del Vehículo</SelectItem>
-                        <SelectItem value="revision-previaje">Revisión Previaje / Precompra</SelectItem>
+                        <SelectItem value="generalInspection">Inspección General del Vehículo</SelectItem>
+                        <SelectItem value="tripInspection">Revisión Previaje / Precompra</SelectItem>
 
                         {/* Servicios Especiales */}
-                        <SelectItem value="verificacion-vehicular">Preparación para Verificación</SelectItem>
-                        <SelectItem value="instalacion-accesorios">Instalación de Accesorios</SelectItem>
+                        <SelectItem value="emissionsPreparation">Preparación para Verificación</SelectItem>
+                        <SelectItem value="accessoriesInstallation">Instalación de Accesorios</SelectItem>
 
                       </SelectContent>
                     </Select>
@@ -192,7 +192,9 @@ export function QuoteSection() {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                  <Button
+                  type="submit"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground hover:cursor-pointer">
                     Enviar Cotización
                   </Button>
                 </form>

@@ -9,6 +9,7 @@ import {
   getPaymentsByContract,
   getTotalPaidByContract,
   getContractsAvailableForPayment,
+  getQuotesAvailableForPayment,
   type CreatePaymentInput,
   type UpdatePaymentInput,
   type PaymentFilters,
@@ -52,4 +53,8 @@ export async function getTotalPaidByContractAction(contractId: number) {
 // Get contracts available for payment
 export async function getContractsAvailableForPaymentAction() {
   return await getContractsAvailableForPayment()
+}
+
+export async function getQuotesAvailableForPaymentAction() {
+  return await getQuotesAvailableForPayment()
 }

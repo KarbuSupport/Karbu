@@ -27,12 +27,13 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
   const [contractStats, setContractStats] = useState(initialStats)
   const handleContracts = async () => {
     const result = await getContractsWithStatusAction()
+    console.log('result :', result);
     if (result.success && result.data) {
-      const statusCount = result.data
+      const statusGroups = result.data
       setContractStats([
-      {...contractStats[0], value: statusCount.CurrentAndPaid},
-      {...contractStats[1], value: statusCount.CurrentAndInDebt},
-      {...contractStats[2], value: statusCount.Expired},
+        { ...contractStats[0], value: (statusGroups["CurrentAndPaid"] || []).length },
+        { ...contractStats[1], value: (statusGroups["CurrentAndInDebt"] || []).length },
+        { ...contractStats[2], value: (statusGroups["Expired"] || []).length },
       ])
     } else {
       console.error("Error fetching contract stats:", result.error)

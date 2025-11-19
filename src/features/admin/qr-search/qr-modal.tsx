@@ -1,5 +1,7 @@
 "use client"
 
+import { useAuth } from "@/src/shared/context/AuthContext"
+import { can } from "@/src/shared/functions/permissions"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface ModalOpcionesContratoProps {
@@ -13,6 +15,7 @@ export default function ModalOpcionesContrato({
   onClose,
   onSelect,
 }: ModalOpcionesContratoProps) {
+  const systemPermissions = useAuth().permissions;
   return (
     <AnimatePresence>
       {isOpen && (
@@ -33,18 +36,20 @@ export default function ModalOpcionesContrato({
             </h2>
 
             <div className="flex flex-col gap-2">
-              <button
+              {can(systemPermissions, "View_Contracts") && (<button
                 onClick={() => onSelect("ver")}
                 className="bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
               >
                 Ver
-              </button>
-              <button
-                onClick={() => onSelect("editar")}
-                className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
-              >
-                Editar
-              </button>
+              </button>)}
+              {can(systemPermissions, "Edit_Contracts") && (
+                <button
+                  onClick={() => onSelect("editar")}
+                  className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+                >
+                  Editar
+                </button>)
+              }
               <button
                 onClick={() => {
                   onSelect("cerrar")

@@ -70,7 +70,7 @@ export function Header() {
                 rel="noopener noreferrer"
                 className="w-full block"
               >
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full mt-4">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full mt-4 hover:cursor-pointer">
                   Contactar por WhatsApp
                 </Button>
               </a>
@@ -102,7 +102,7 @@ export function Header() {
                 rel="noopener noreferrer"
                 className="w-full block"
               >
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full mt-4">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full mt-4 hover:cursor-pointer">
                   Contactar por WhatsApp
                 </Button>
               </a>

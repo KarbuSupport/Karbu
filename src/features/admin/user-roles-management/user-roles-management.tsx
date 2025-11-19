@@ -447,10 +447,15 @@ export function RolesManagement() {
                         />
                       </div>
                       <div className="flex gap-2">
-                        <Button onClick={() => setIsNewSystemUserOpen(false)} variant="outline" className="flex-1">
+                        <Button
+                        onClick={() => setIsNewSystemUserOpen(false)}
+                        variant="outline"
+                        className="flex-1 hover:cursor-pointer">
                           Cancelar
                         </Button>
-                        <Button onClick={handleUserSubmit} className="flex-1 bg-accent hover:bg-accent/90">
+                        <Button
+                        onClick={handleUserSubmit}
+                        className="flex-1 bg-accent hover:bg-accent/90 hover:cursor-pointer">
                           {editingUser ? "Actualizar" : "Crear"} Usuario
                         </Button>
                       </div>
@@ -465,7 +470,10 @@ export function RolesManagement() {
                     <CardTitle>Usuarios Activos</CardTitle>
                     <div className="flex items-center space-x-2">
                       <Input placeholder="Buscar usuarios del sistema..." className="w-64" />
-                      <Button variant="outline" size="sm">
+                      <Button
+                      variant="outline"
+                      size="sm"
+                      className="hover:cursor-pointer">
                         <Search className="w-4 h-4" />
                       </Button>
                     </div>
@@ -510,7 +518,11 @@ export function RolesManagement() {
                           <TableCell>
                             <div className="flex space-x-2">
                               {can(systemPermissions,"Edit_Users") && (
-                              <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)}>
+                              <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditUser(user)}
+                              className="hover:cursor-pointer">
                                 <Edit className="w-4 h-4" />
                               </Button>
                               )}
@@ -518,7 +530,7 @@ export function RolesManagement() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="text-destructive"
+                                className="text-destructive hover:cursor-pointer"
                                 onClick={() => handleDeleteUser(user.id)}
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -558,10 +570,12 @@ export function RolesManagement() {
                   }}
                 >
                   <DialogTrigger asChild>
-                    <Button className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
+                    {can(systemPermissions, "Create_Roles_and_Permissions") && (
+                      <Button
+                      className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
                       <Plus className="w-4 h-4 mr-2" />
                       Nuevo Rol
-                    </Button>
+                    </Button>)}
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
@@ -608,10 +622,15 @@ export function RolesManagement() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button onClick={() => setIsNewRoleOpen(false)} variant="outline" className="flex-1">
+                        <Button
+                        onClick={() => setIsNewRoleOpen(false)}
+                        variant="outline"
+                        className="flex-1 hover:cursor-pointer">
                           Cancelar
                         </Button>
-                        <Button onClick={handleRoleSubmit} className="flex-1 bg-accent hover:bg-accent/90">
+                        <Button
+                        onClick={handleRoleSubmit}
+                        className="flex-1 bg-accent hover:bg-accent/90 hover:cursor-pointer">
                           {editingRole ? "Actualizar" : "Crear"} Rol
                         </Button>
                       </div>
@@ -649,23 +668,27 @@ export function RolesManagement() {
                           </div>
                         </div>
                         <div className="flex space-x-2 pt-2">
-                          <Button
+                          {can(systemPermissions, "Edit_Roles_and_Permissions") && (
+                            <Button
                             variant="outline"
                             size="sm"
-                            className="flex-1 bg-transparent"
+                            className="flex-1 bg-transparent hover:cursor-pointer"
                             onClick={() => handleEditRole(role)}
                           >
                             <Edit className="w-3 h-3 mr-1" />
                             Editar
-                          </Button>
-                          <Button
+                          </Button>)}
+                          {can(systemPermissions, "Delete_Roles_and_Permissions") && (
+                            <Button
                             variant="outline"
                             size="sm"
-                            className="text-destructive bg-transparent"
+                            className={
+                              `${"text-destructive bg-transparent hover:cursor-pointer "}
+                              ${!can(systemPermissions, "Edit_Roles_and_Permissions") ? "flex-1 bg-transparent" : ""}`}
                             onClick={() => handleDeleteRole(role.id)}
                           >
                             <Trash2 className="w-3 h-3" />
-                          </Button>
+                          </Button>)}
                         </div>
                       </div>
                     </CardContent>

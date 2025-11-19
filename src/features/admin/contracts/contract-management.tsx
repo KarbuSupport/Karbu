@@ -20,6 +20,8 @@ import { ContractFormModal } from "./contract-form-modal"
 import { ContractViewModal } from "./contract-view-modal"
 import { downloadContractPDF } from "@/src/lib/contract-pdf-generator"
 import { generateQrImg, generateQrWithId } from "@/src/lib/generateQr"
+import { can } from "@/src/shared/functions/permissions"
+import { useAuth } from "@/src/shared/context/AuthContext"
 
 interface Contract {
   id: number
@@ -54,6 +56,7 @@ interface Stats {
 }
 
 export function ContractsManagement() {
+  const systemPermissions = useAuth().permissions;
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isViewOpen, setIsViewOpen] = useState(false)
   const [contracts, setContracts] = useState<Contract[]>([])
@@ -108,10 +111,8 @@ export function ContractsManagement() {
       CurrentAndInDebt: "Al corriente y con deuda",
       Expired: "Vencido",
     }
-
     return statusNames[name] ?? "Desconocido"
   }
-
 
   const handleCreateContract = async (data: any) => {
     setIsSubmitting(true)
@@ -185,27 +186,28 @@ export function ContractsManagement() {
   }
 
   async function handleDownloadContract(contract: any) {
-  let contractWithQr = { ...contract }
+    let contractWithQr = { ...contract }
 
-  // Si tiene qrId pero no qrCode, generamos QR
-  if (contract.qrCode) {
-    const { qrBase64 } = await generateQrImg(contract.qrCode)
-    contractWithQr.qrCode = qrBase64.replace(/^data:image\/png;base64,/, "")
-    // contractWithQr.qrCode = qrBase64
+    // Si tiene qrId pero no qrCode, generamos QR
+    if (contract.qrCode) {
+      const { qrBase64 } = await generateQrImg(contract.qrCode)
+      contractWithQr.qrCode = qrBase64.replace(/^data:image\/png;base64,/, "")
+      // contractWithQr.qrCode = qrBase64
+    }
+
+    downloadContractPDF(contractWithQr)
   }
-
-  downloadContractPDF(contractWithQr)
-}
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Gestión de Contratos</h1>
-          <p className="text-muted-foreground">Administra contratos, genera PDFs y descarga documentos</p>
+          <p className="text-muted-foreground">Administra contratos y documentos</p>
         </div>
-        <Button
-          className="bg-accent hover:bg-accent/90"
+        {can(systemPermissions, "Create_Contracts") && (
+          <Button
+          className="bg-accent hover:bg-accent/90 hover:cursor-pointer"
           onClick={() => {
             setEditingContract(null)
             setIsFormOpen(true)
@@ -213,7 +215,7 @@ export function ContractsManagement() {
         >
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Contrato
-        </Button>
+        </Button>)}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -239,7 +241,7 @@ export function ContractsManagement() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Vencidos</CardTitle>
+            <CardTitle className="text-sm font-medium">Contratos Vencidos</CardTitle>
             <AlertTriangle className="w-4 h-4 text-red-500" />
           </CardHeader>
           <CardContent>
@@ -260,7 +262,7 @@ export function ContractsManagement() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="CurrentAndPaid" >Vigente y pagado</SelectItem>
+                  <SelectItem value="CurrentAndPaid">Vigente y pagado</SelectItem>
                   <SelectItem value="CurrentAndInDebt">Vigente y con deuda</SelectItem>
                   <SelectItem value="Expired">Vencido</SelectItem>
                 </SelectContent>
@@ -271,13 +273,15 @@ export function ContractsManagement() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Button variant="outline" size="sm">
+              <Button
+              variant="outline" 
+              size="sm"
+              className="hover:cursor-pointer">
                 <Search className="w-4 h-4" />
               </Button>
             </div>
           </div>
         </CardHeader>
-        {/* ------------------------------------------------------------------------------------ */}
         <CardContent>
           {loading ? (
             <div className="text-center py-8">Cargando contratos...</div>
@@ -325,7 +329,6 @@ export function ContractsManagement() {
                         </div>
                       </TableCell>
                       <TableCell className="font-bold">${totalPrice.toLocaleString()}</TableCell>
-                      {/* -------------------------------------------------------- */}
                       <TableCell>
                         <Badge
                           variant={
@@ -339,7 +342,6 @@ export function ContractsManagement() {
                           {handleStatusNames(contract.status)}
                         </Badge>
                       </TableCell>
-                      {/* -------------------------------------------------------- */}
                       <TableCell>
                         <div className="flex space-x-2">
                           <Button
@@ -347,6 +349,7 @@ export function ContractsManagement() {
                             size="sm"
                             onClick={() => handleViewContract(contract.id)}
                             title="Ver detalles"
+                            className="hover:cursor-pointer"
                           >
                             <Eye className="w-4 h-4" />
                           </Button>
@@ -355,21 +358,33 @@ export function ContractsManagement() {
                             size="sm"
                             onClick={() => handleDownloadContract(contract as any)}
                             title="Descargar PDF"
+                            className="hover:cursor-pointer"
                           >
                             <Download className="w-4 h-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleEditContract(contract)} title="Editar">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
+                          {
+                            can(systemPermissions, "Edit_Contracts") && (
+                              <Button 
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditContract(contract)}
+                              title="Editar"
+                              className="hover:cursor-pointer">
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            )}
+
+                          {can(systemPermissions, "Delete_Contracts") && (
+                            <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteContract(contract.id)}
-                            className="text-red-500 hover:text-red-700"
+                            className="text-red-500 hover:text-red-700 hover:cursor-pointer"
                             title="Eliminar"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
+                        )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -379,8 +394,6 @@ export function ContractsManagement() {
             </Table>
           )}
         </CardContent>
-        {/* ------------------------------------------------------------------------------------ */}
-
       </Card>
 
       <ContractFormModal

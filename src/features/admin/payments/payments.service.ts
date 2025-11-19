@@ -56,10 +56,15 @@ export async function createPayment(data: CreatePaymentInput) {
 
         if (!payment) { throw new Error("Payment could not be created.") }
 
-        // Calcular el total del contrato basado en los servicios
-        if (!payment.contract || !payment.contract.services) {
-            throw new Error("Contract or services not found for this payment.")
+        if (!payment.contract) {
+            // Es un pago de cotización, sin contrato
+            return {
+                message: "Payment created for quote (no contract yet).",
+                payment,
+                newStatus: null
+            }
         }
+        // Calcular el total del contrato basado en los servicios
         const totalContractAmount =
             payment.contract.services?.reduce((sum, s) => {
                 const price = typeof s.price === "number" ? s.price : Number(s.price)
@@ -126,9 +131,10 @@ export async function getPayments(filters?: PaymentFilters) {
                 responsible: true,
             },
             orderBy: {
-                paymentDate: "desc",
+                id: "desc"
             },
         })
+        console.log('payments :', payments);
         return payments
     } catch (error) {
         console.error("Error fetching payments:", error)
@@ -217,7 +223,7 @@ export async function getPaymentsByContract(contractId: number) {
                 responsible: true,
             },
             orderBy: {
-                paymentDate: "desc",
+                id: "desc",
             },
         })
         return payments
@@ -257,5 +263,21 @@ export async function getContractsAvailableForPayment() {
     } catch (error) {
         console.error("Error fetching available contracts:", error)
         throw new Error("Failed to fetch available contracts")
+    }
+}
+
+export async function getQuotesAvailableForPayment() {
+    try {
+        const quotes = await prisma.quote.findMany({
+            include: {
+                vehicle: true,
+                Payment: true
+            },
+        })
+        console.log('quotes :', quotes);
+        return quotes
+    } catch (error) {
+        console.error("Error fetching available quotes:", error)
+        throw new Error("Failed to fetch available quotes")
     }
 }

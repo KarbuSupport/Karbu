@@ -74,7 +74,7 @@ export function ServicesSection() {
                     </li>
                   ))}
                 </ul>
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground hover:cursor-pointer">
                   Más Información
                 </Button>
               </CardContent>

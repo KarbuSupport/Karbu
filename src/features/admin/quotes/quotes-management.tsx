@@ -8,8 +8,11 @@ import { QuoteFormModal } from "@/src/features/admin/quotes/components/quotes-fo
 import { QuotesTable } from "@/src/features/admin/quotes/components/quotes-table"
 import { getAllQuotesAction, getQuotesStatsAction } from "@/src/features/admin/quotes/quotes.actions"
 import type { QuoteWithRelations } from "@/src/shared/types/quote"
+import { can } from "@/src/shared/functions/permissions"
+import { useAuth } from "@/src/shared/context/AuthContext"
 
 export function QuotesManagement() {
+  const systemPermissions = useAuth().permissions;
   const [quotes, setQuotes] = useState<QuoteWithRelations[]>([])
   const [stats, setStats] = useState({ total: 0, withPurchaseCheck: 0, totalEstimate: 0 })
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -74,10 +77,13 @@ export function QuotesManagement() {
           <h1 className="text-3xl font-bold">Gestión de Cotizaciones</h1>
           <p className="text-muted-foreground">Administra todas las cotizaciones de servicios</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="bg-accent hover:bg-accent/90">
+        {can(systemPermissions, "Create_Quotations") && (
+          <Button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
           <Plus className="w-4 h-4 mr-2" />
           Nueva Cotización
-        </Button>
+        </Button>)}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
