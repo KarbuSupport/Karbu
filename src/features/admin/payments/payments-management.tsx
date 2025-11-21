@@ -171,7 +171,7 @@ async function searchPayments(term: string) {
         method: formData.method,
         paymentDate: fixedDate,
         voucherNumber: formData.voucherNumber || undefined,
-        responsibleUser: currentUserId || 1, // TODO: Get from current user context
+        responsibleUser: Number(currentUserId) || 1, // TODO: Get from current user context
       })
 
       // Reset form and reload data

@@ -150,7 +150,7 @@ export function ContractFormModal({
       profecoDate: formData.profecoDate ? new Date(formData.profecoDate) : undefined,
       services: selectedServices,
       clientSignature: clientSignature,
-      responsibleUser: currentUserId,
+      responsibleUser: Number(currentUserId),
     })
   }
 

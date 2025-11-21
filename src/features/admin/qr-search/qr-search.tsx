@@ -12,6 +12,7 @@ import { searchContractAction } from "@/src/features/admin/qr-search/qr-search.a
 import { ContractFormModal } from "../contracts/contract-form-modal"
 import { ContractViewModal } from "../contracts/contract-view-modal"
 import { updateContractAction } from "../contracts/contract.actions"
+import { useAuth } from "@/src/shared/context/AuthContext"
 
 declare global {
     interface Window {
@@ -20,6 +21,7 @@ declare global {
 }
 
 export function QRSearch() {
+    const currentUserId = useAuth().userId;
     const [qrSearchQuery, setQrSearchQuery] = useState("")
     const [qrSearchResult, setQrSearchResult] = useState<any>(null)
     const [isScanning, setIsScanning] = useState(false)
@@ -329,6 +331,7 @@ export function QRSearch() {
                     setIsModalOpen(open)
                 }}
                 onSubmit={(data) => handleUpdateContract(data)}
+                currentUserId={currentUserId}
                 initialData={qrSearchResult}
                 isLoading={isLoading}
             />

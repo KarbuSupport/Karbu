@@ -406,7 +406,7 @@ export function ContractsManagement() {
         onSubmit={editingContract ? handleUpdateContract : handleCreateContract}
         initialData={editingContract}
         isLoading={isSubmitting}
-        currentUserId={currentUserId || null}
+        currentUserId={currentUserId}
       />
 
       <ContractViewModal contract={selectedContract} open={isViewOpen} onOpenChange={setIsViewOpen} />
