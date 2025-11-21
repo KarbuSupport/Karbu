@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/src/shared/components/ui/button"
 import { useAuth } from "@/src/shared/context/AuthContext"
 import { can } from "@/src/shared/functions/permissions"
 import { motion, AnimatePresence } from "framer-motion"
@@ -36,29 +37,30 @@ export default function ModalOpcionesContrato({
             </h2>
 
             <div className="flex flex-col gap-2">
-              {can(systemPermissions, "View_Contracts") && (<button
+              {can(systemPermissions, "View_Contracts") && (
+                <Button
                 onClick={() => onSelect("ver")}
-                className="bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                className="bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition hover:cursor-pointer"
               >
                 Ver
-              </button>)}
+              </Button>)}
               {can(systemPermissions, "Edit_Contracts") && (
-                <button
+                <Button
                   onClick={() => onSelect("editar")}
-                  className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
+                  className="bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition hover:cursor-pointer"
                 >
                   Editar
-                </button>)
+                </Button>)
               }
-              <button
+              <Button
                 onClick={() => {
                   onSelect("cerrar")
                   onClose()
                 }}
-                className="bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400 transition"
+                className="bg-gray-300 text-gray-800 py-2 rounded-lg hover:bg-gray-400 transitio hover:cursor-pointer"
               >
                 Cerrar
-              </button>
+              </Button>
             </div>
           </motion.div>
         </motion.div>

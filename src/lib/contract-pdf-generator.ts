@@ -1,7 +1,7 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 export async function downloadContractPDF(contract: any) {
-console.log('contract :', contract);
+  console.log('contract :', contract);
   const pdfUrls = [
     "/plantillas/contrato_pagina1.pdf",
     "/plantillas/contrato_pagina2.pdf",
@@ -60,22 +60,96 @@ console.log('contract :', contract);
 
     if (i === 1) {
       // ====================
+      // FECHA DE FIRMA
+      // ====================
+      const currentDate = new Date()
+
+      const day = currentDate.getDate()
+      const year = currentDate.getFullYear()
+
+      const monthNames = [
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+      ]
+
+      const month = monthNames[currentDate.getMonth()]
+
+      currentPage.drawText(String(day), { x: 488, y: 283, size: 6, font: helvetica, color: rgb(0, 0, 0),  })
+      currentPage.drawText(String(month), { x: 330, y: 274, size: 6, font: helvetica, color: rgb(0, 0, 0),  })
+      currentPage.drawText(String(year), { x: 400, y: 274, size: 6, font: helvetica, color: rgb(0, 0, 0),  })
+
+      // ====================
       // CONSENTIMIENTOS
       // ====================
+      if (contract.advertisingConsent) {
+        currentPage.drawText("x", { x: 369, y: 169, ...textOptions })
+      } else {
+        currentPage.drawText("x", { x: 387, y: 169, ...textOptions })
+      }
+
+      if (contract.marketingConsent) {
+        currentPage.drawText("x", { x: 421, y: 189, ...textOptions })
+      } else {
+        currentPage.drawText("x", { x: 439, y: 189, ...textOptions })
+      }
 
       // ====================
       // PROFECO
       // ====================
-      currentPage.drawText(new Date(contract.startDate).toLocaleDateString("es-ES") || "", { x: 450, y: 123, size: 3, font: helvetica, color: rgb(0, 0, 0), });
+      currentPage.drawText(new Date(contract.startDate).toLocaleDateString("es-ES") || "", { x: 450, y: 123, size: 3.5, font: helvetica, color: rgb(0, 0, 0), });
       currentPage.drawText(contract.profecoNumber || "", { x: 410, y: 123, size: 4, font: helvetica, color: rgb(0, 0, 0), });
       // ====================
-      // FIRMA
+      // FIRMA (Imagen)
       // ====================
+      if (contract.clientSignature) {
+        const pngImageBytes = await fetch(contract.clientSignature).then(res => res.arrayBuffer());
+        const pngImage = await mergedPdf.embedPng(pngImageBytes);
+        const pngDims = pngImage.scale(0.20); // Ajusta el tamaño según necesites
+        currentPage.drawImage(pngImage, {
+          x: 380,
+          y: 138, // misma posición de la línea
+          width: pngDims.width,
+          height: pngDims.height,
+        });
+      }
       currentPage.drawText("_________________________", { x: 360, y: 156, ...textOptions });
-      // currentPage.drawText("Firma del Consumidor", { x: 315, y: 120, ...textOptions });
-    }
-  }
+    
+  // Crear la página en blanco
+// const blankPage = mergedPdf.addPage([595, 842]); // tamaño A4
+// const { width, height } = blankPage.getSize();
+const { width } = currentPage.getSize();
 
+// 📌 Insertar texto
+// currentPage.drawText("Aquí puedes escribir lo que quieras en la última página", {
+//   x: 50,
+//   y: height - 50,
+//   size: 12,
+//   font: await mergedPdf.embedFont(StandardFonts.Helvetica),
+//   color: rgb(0, 0, 0),
+// });
+
+// 📌 Insertar QR desde base64
+if (contract.qrCode) {
+  const qrBase64 = contract.qrCode;
+
+  // Convertir Base64 a ArrayBuffer
+  const qrBytes = Uint8Array.from(atob(qrBase64), c => c.charCodeAt(0));
+
+  // Embedir la imagen PNG en el PDF
+  const qrImage = await mergedPdf.embedPng(qrBytes);
+
+  const qrDims = qrImage.scale(0.25); // ajustar tamaño
+
+  currentPage.drawImage(qrImage, {
+    x: width - qrDims.width - 40,
+    y: 50,
+    width: qrDims.width,
+    height: qrDims.height,
+  });
+}
+
+}
+  }
   // ✅ Convertir Uint8Array a ArrayBuffer limpio (evita SharedArrayBuffer)
   const pdfBytes = await mergedPdf.save();
   const arrayBuffer = new ArrayBuffer(pdfBytes.length);

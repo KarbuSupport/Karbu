@@ -4,8 +4,8 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/shared/components/ui/table"
 import { Button } from "@/src/shared/components/ui/button"
 import { Badge } from "@/src/shared/components/ui/badge"
-import { Eye, Pencil, Trash2 } from "lucide-react"
-import type { QuoteWithRelations } from "@/src/shared/types/quote"
+import { Download, Edit, Eye, Trash2 } from "lucide-react"
+import type { QuoteFormData, QuoteWithRelations } from "@/src/shared/types/quote"
 import { deleteQuoteAction, getQuoteByIdAction } from "@/src/features/admin/quotes/quotes.actions"
 import { useToast } from "@/src/shared/hooks/use-toast"
 import {
@@ -21,6 +21,7 @@ import {
 import { QuoteViewModal } from "./quote-view-modal"
 import { useAuth } from "@/src/shared/context/AuthContext"
 import { can } from "@/src/shared/functions/permissions"
+import { generateQuotePDF } from "@/src/lib/pdf-generator"
 
 interface QuotesTableProps {
   quotes: QuoteWithRelations[]
@@ -154,24 +155,32 @@ export function QuotesTable({ quotes, onEdit, onRefresh }: QuotesTableProps) {
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Descargar PDF"
+                      className="hover:cursor-pointer"
+                      onClick={() => generateQuotePDF(quote as QuoteFormData, String(quote.id))}>
+                      <Download className="w-4 h-4" />
+                    </Button>
                     {can(systemPermissions, "Edit_Quotations") && (
                       <Button
-                      variant="ghost"
-                      className="h-8 w-8 p-0 hover:cursor-pointer"
-                      onClick={() => onEdit(quote)}>
-                        <Pencil className="" />
+                        variant="ghost"
+                        className="h-8 w-8 p-0 hover:cursor-pointer"
+                        onClick={() => onEdit(quote)}>
+                        <Edit className="w-4 h-4" />
                       </Button>
-                      )
+                    )
                     }
-                    
+
                     {can(systemPermissions, "Delete_Quotations") && (
                       <Button
                         variant="ghost"
                         className="h-8 w-8 p-0 text-destructive hover:cursor-pointer"
                         onClick={() => setDeleteId(quote.id)}
-                        >
-                      <Trash2 className="" />
-                    </Button>)}
+                      >
+                        <Trash2 className="" />
+                      </Button>)}
                   </TableCell>
                 </TableRow>
               ))

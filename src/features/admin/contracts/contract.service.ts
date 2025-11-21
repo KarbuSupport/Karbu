@@ -23,6 +23,7 @@ export class ContractService {
     advertisingConsent?: boolean
     profecoNumber?: string
     profecoDate?: Date
+    clientSignature?: string
     qrCode?: string
   }) {
     try {
@@ -47,6 +48,7 @@ export class ContractService {
           advertisingConsent: data.advertisingConsent || false,
           profecoNumber: data.profecoNumber,
           profecoDate: data.profecoDate,
+          clientSignature: data.clientSignature,
           qrCode: data.qrCode || `QR${Date.now()}${Math.random().toString(36).substr(2, 9)}`,
           services: {
             create: data.services.map((s) => ({
@@ -93,15 +95,131 @@ export class ContractService {
       }
 
       if (filters?.search) {
-        const searchNumber = Number(filters.search.replace(/^CNT-/, ""))
-        where.OR = [
-          { clientName: { contains: filters.search, mode: "insensitive" } },
-          { vehicle: { licensePlate: { contains: filters.search, mode: "insensitive" } } },
-        ]
-        if (!isNaN(searchNumber)) {
-          where.OR.push({ id: searchNumber })
+        const searchRaw = filters.search.trim()
+        const search = searchRaw.replace(/^CNT-/i, "") // quitar prefijo CNT- si existe
+        const searchLower = search.toLowerCase()
+
+        const searchNumber = Number(search)
+        const isNumeric = !isNaN(searchNumber)
+
+        // mapping meses (español + inglés) -> índice 0-11
+        const monthMap: Record<string, number> = {
+          enero: 0, february: 1, feb: 1, febrero: 1, marzo: 2, mar: 2,
+          abril: 3, apr: 3, mayo: 4, may: 4, junio: 5, jun: 5,
+          julio: 6, jul: 6, agosto: 7, aug: 7, septiembre: 8, sep: 8, sept: 8,
+          octubre: 9, oct: 9, noviembre: 10, nov: 10, diciembre: 11, dec: 11, december: 11
         }
+
+        // ayudantes para rangos
+        const makeDayRange = (date: Date) => {
+          const start = new Date(date)
+          start.setHours(0, 0, 0, 0)
+          const end = new Date(start)
+          end.setDate(start.getDate() + 1)
+          return { gte: start, lt: end }
+        }
+
+        const orConditions: any[] = []
+
+        // Cliente
+        orConditions.push({ clientName: { contains: searchRaw, mode: "insensitive" } })
+
+        // Estado
+        orConditions.push({ status: { contains: searchRaw, mode: "insensitive" } })
+
+        // Vehículo: brand / model / licensePlate
+        orConditions.push({
+          vehicle: {
+            OR: [
+              { brand: { contains: searchRaw, mode: "insensitive" } },
+              { model: { contains: searchRaw, mode: "insensitive" } },
+              { licensePlate: { contains: searchRaw, mode: "insensitive" } },
+            ],
+          },
+        })
+
+        // ID tipo CNT-123 o solo número -> buscar por id
+        if (!isNaN(Number(search))) {
+          orConditions.push({ id: Number(search) })
+        }
+
+        // --------- Fecha avanzada -----------
+        // 1) intentar parsear como fecha completa (ISO / '20/11/2025' / '20 nov 2025', etc.)
+        const parsed = new Date(search)
+        if (!isNaN(parsed.getTime())) {
+          // rango del día detectado
+          orConditions.push({ createdAt: makeDayRange(parsed) })
+        } else {
+          // 2) detectar patrón dd/mm/yyyy o dd-mm-yyyy manualmente (para mayor robustez)
+          const dmY = search.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/)
+          if (dmY) {
+            const d = Number(dmY[1])
+            const m = Number(dmY[2]) - 1
+            let y = Number(dmY[3])
+            if (y < 100) y += 2000
+            const dt = new Date(y, m, d)
+            orConditions.push({ createdAt: makeDayRange(dt) })
+          } else {
+            // 3) buscar por mes por nombre (ej: "noviembre" o "nov")
+            for (const key of Object.keys(monthMap)) {
+              if (searchLower.includes(key)) {
+                const monthIndex = monthMap[key]
+                // si el search incluye un año (ej "noviembre 2025")
+                const yearMatch = search.match(/(19|20)\d{2}/)
+                const yearNum = yearMatch ? Number(yearMatch[0]) : new Date().getFullYear()
+                const monthStart = new Date(yearNum, monthIndex, 1)
+                const monthEnd = new Date(yearNum, monthIndex + 1, 1)
+                orConditions.push({ createdAt: { gte: monthStart, lt: monthEnd } })
+                break
+              }
+            }
+
+            // 4) buscar por año solamente (ej "2025")
+            const yearOnly = search.match(/^(19|20)\d{2}$/)
+            if (yearOnly) {
+              const y = Number(yearOnly[0])
+              const start = new Date(y, 0, 1)
+              const end = new Date(y + 1, 0, 1)
+              orConditions.push({ createdAt: { gte: start, lt: end } })
+            }
+
+            // 5) búsqueda por día del mes solamente (ej "20") -> interpreto como día del mes actual
+            const dayOnly = search.match(/^(\d{1,2})$/)
+            if (dayOnly) {
+              const dayNum = Number(dayOnly[1])
+              if (dayNum >= 1 && dayNum <= 31) {
+                const now = new Date()
+                const start = new Date(now.getFullYear(), now.getMonth(), dayNum)
+                const end = new Date(start)
+                end.setDate(start.getDate() + 1)
+                // sólo agregar si la fecha resultante es válida (evitar 31 febrero)
+                if (!isNaN(start.getTime())) {
+                  orConditions.push({ createdAt: { gte: start, lt: end } })
+                }
+              }
+            }
+          }
+        }
+
+        // Asignar OR al where (si ya existe, concatena)
+        if (!where.OR) where.OR = []
+        where.OR = where.OR.concat(orConditions)
+
+        // --------- Manejo de búsqueda por monto total (post-filter) -----------
+        // Si el usuario escribió un número con decimales o con separadores (ej "12,500" o "12500")
+        // lo consideramos búsqueda posible de totalPrice; no se puede hacer en Prisma sin un campo agregado,
+        // así que devolvemos una marca para filtrar después de la consulta.
+        // Para detectar montos escritos con comas o puntos:
+        const numericLike = searchRaw.replace(/[,\s]/g, "").replace(/^\$/, "")
+        const maybeAmount = Number(numericLike)
+          // exporta dos variables auxiliares que puedes usar después:
+          // - needsPostFilterByTotal: boolean
+          // - postFilterTotalValue: number | undefined
+          ; (filters as any).needsPostFilterByTotal = !isNaN(maybeAmount) && maybeAmount > 0 ? true : false
+          ; (filters as any).postFilterTotalValue = !isNaN(maybeAmount) && maybeAmount > 0 ? maybeAmount : undefined
       }
+
+
 
       const contracts = await prisma.contract.findMany({
         where,
@@ -184,6 +302,7 @@ export class ContractService {
       advertisingConsent?: boolean
       profecoNumber?: string
       profecoDate?: Date
+      clientSignature?: string
       services?: Array<{ serviceId: number; price: number }>
     },
   ) {
@@ -215,13 +334,14 @@ export class ContractService {
           advertisingConsent: data.advertisingConsent,
           profecoNumber: data.profecoNumber,
           profecoDate: data.profecoDate,
+          clientSignature: data.clientSignature,
           services: data.services
             ? {
-                create: data.services.map((s) => ({
-                  serviceId: s.serviceId,
-                  price: new Prisma.Decimal(s.price),
-                })),
-              }
+              create: data.services.map((s) => ({
+                serviceId: s.serviceId,
+                price: new Prisma.Decimal(s.price),
+              })),
+            }
             : undefined,
         },
         include: {

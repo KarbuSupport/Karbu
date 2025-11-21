@@ -48,6 +48,7 @@ export async function createContractAction(data: {
   advertisingConsent?: boolean
   profecoNumber?: string
   profecoDate?: Date
+  clientSignature?: string
   qrCode?: string
 }) {
   try {
@@ -80,6 +81,7 @@ export async function updateContractAction(
     advertisingConsent?: boolean
     profecoNumber?: string
     profecoDate?: Date
+    clientSignature?: string
     services?: Array<{ serviceId: number; price: number }>
   },
 ) {

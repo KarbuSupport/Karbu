@@ -13,6 +13,7 @@ import {
   type CreatePaymentInput,
   type UpdatePaymentInput,
   type PaymentFilters,
+  getPaymentsStats,
 } from "@/src/features/admin/payments/payments.service"
 
 // CREATE
@@ -22,7 +23,13 @@ export async function createPaymentAction(data: CreatePaymentInput) {
 
 // READ - All payments
 export async function getPaymentsAction(filters?: PaymentFilters) {
-  return await getPayments(filters)
+  try {
+    const payments = await getPayments(filters)
+    return payments
+  } catch (error) {
+    console.error("Server action error:", error)
+    return []
+  }
 }
 
 // READ - Single payment
@@ -57,4 +64,9 @@ export async function getContractsAvailableForPaymentAction() {
 
 export async function getQuotesAvailableForPaymentAction() {
   return await getQuotesAvailableForPayment()
+}
+
+export async function getPaymentsStatsAction() {
+  const {data} = await getPaymentsStats()
+  return data;
 }

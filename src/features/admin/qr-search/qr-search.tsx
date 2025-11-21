@@ -289,7 +289,7 @@ export function QRSearch() {
                             <Button
                                 onClick={isScanning ? stopScanner : startScanner}
                                 variant={isScanning ? "destructive" : "default"}
-                                className={!isScanning ? "bg-accent hover:bg-accent/90 hover:cursor-pointer" : ""}
+                                className={!isScanning ? "bg-accent hover:bg-accent/90 hover:cursor-pointer" : "hover:cursor-pointer"}
                                 disabled={isLoading}
                             >
                                 {isScanning ? "Detener Escaneo" : "Iniciar Escaneo"}
