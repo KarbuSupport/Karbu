@@ -7,7 +7,7 @@ import { Input } from "@/src/shared/components/ui/input"
 import { Badge } from "@/src/shared/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/shared/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/shared/components/ui/select"
-import { Plus, CheckCircle, Clock, AlertTriangle, XCircle, Search, Download, Eye, Edit, Trash2 } from "lucide-react"
+import { Plus, CheckCircle, Clock, AlertTriangle, Search, Download, Eye, Edit, Trash2 } from "lucide-react"
 import {
   getContractsAction,
   createContractAction,
@@ -15,6 +15,8 @@ import {
   deleteContractAction,
   getContractStatsAction,
   getContractByIdAction,
+  getVehiclesAction,
+  getServicesAction,
 } from "@/src/features/admin/contracts/contract.actions"
 import { ContractFormModal } from "./contract-form-modal"
 import { ContractViewModal } from "./contract-view-modal"
@@ -73,8 +75,8 @@ export function ContractsManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    loadContracts()
-    loadStats()
+    loadContracts();
+    loadStats();
   }, [filterStatus, searchTerm])
 
   const loadContracts = async () => {
@@ -117,7 +119,7 @@ export function ContractsManagement() {
   const handleCreateContract = async (data: any) => {
     setIsSubmitting(true)
     try {
-      const { qrId } = await generateQrWithId("CTN")
+      const { qrId } = await generateQrWithId("CNT")
       const contractDataWithQr = {
         ...data,
         qrCode: qrId,
@@ -137,6 +139,7 @@ export function ContractsManagement() {
   }
 
   const handleUpdateContract = async (data: any) => {
+  console.log('data :', data);
     if (!editingContract) return
     setIsSubmitting(true)
     try {

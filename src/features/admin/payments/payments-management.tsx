@@ -24,6 +24,7 @@ import {
   getQuotesAvailableForPaymentAction,
   updatePaymentAction,
   deletePaymentAction,
+  getPaymentsStatsAction,
 } from "@/src/features/admin/payments/payments.actions"
 import { useAuth } from "@/src/shared/context/AuthContext"
 import { can } from "@/src/shared/functions/permissions"
@@ -38,6 +39,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/src/shared/components/ui/alert-dialog"
+import { generatePaymentPDF } from "@/src/lib/payment-pdf-generator"
 
 interface Payment {
   id: number
@@ -79,6 +81,12 @@ export function PaymentsManagement() {
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(true)
+  const [stats, setStats] = useState({
+  CurrentAndInDebt: 0,
+  monthlyIncome: 0,
+  todayPayments: 0,
+  totalProcessed: 0,
+})
 
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
   const [isViewOpen, setIsViewOpen] = useState(false)
@@ -101,23 +109,47 @@ export function PaymentsManagement() {
     loadData()
   }, [])
 
+  // Filtrado cuando cambia searchTerm
+useEffect(() => {
+  if (searchTerm.trim() === "") {
+    loadData() // Si el buscador está vacío, mostrar todo
+  } else {
+    searchPayments(searchTerm)
+  }
+}, [searchTerm])
+
   async function loadData() {
     try {
       setIsLoading(true)
-      const [paymentsData, contractsData, quotesData] = await Promise.all([
+      const [paymentsData, contractsData, quotesData, statsData] = await Promise.all([
         getPaymentsAction(),
         getContractsAvailableForPaymentAction(),
         getQuotesAvailableForPaymentAction(),
+        getPaymentsStatsAction(),
       ])
       setPayments(paymentsData)
       setContracts(contractsData)
       setQuotes(quotesData)
+      setStats(statsData)
     } catch (error) {
       console.error("Error loading data:", error)
     } finally {
       setIsLoading(false)
     }
   }
+
+  // Búsqueda de pagos según searchTerm
+async function searchPayments(term: string) {
+  try {
+    setIsLoading(true)
+    const paymentsData = await getPaymentsAction({ search: term })
+    setPayments(paymentsData)
+  } catch (error) {
+    console.error("Error searching payments:", error)
+  } finally {
+    setIsLoading(false)
+  }
+}
 
   async function handleCreatePayment() {
     const isQuotePayment = formData.paymentType === "quote"
@@ -192,24 +224,24 @@ export function PaymentsManagement() {
     }
   }
 
-  const todayPayments = payments.filter((p) => {
-    const paymentDate = new Date(p.paymentDate)
-    const today = new Date()
-    return paymentDate.toDateString() === today.toDateString()
-  }).length
+  // const todayPayments = payments.filter((p) => {
+  //   const paymentDate = new Date(p.paymentDate)
+  //   const today = new Date()
+  //   return paymentDate.toDateString() === today.toDateString()
+  // }).length
 
-  const monthlyIncome = payments
-    .filter((p) => {
-      const paymentDate = new Date(p.paymentDate)
-      const now = new Date()
-      return paymentDate.getMonth() === now.getMonth() && paymentDate.getFullYear() === now.getFullYear()
-    })
-    .reduce((sum, p) => sum + (typeof p.amount === "number" ? p.amount : Number.parseFloat(p.amount)), 0)
+  // const monthlyIncome = payments
+  //   .filter((p) => {
+  //     const paymentDate = new Date(p.paymentDate)
+  //     const now = new Date()
+  //     return paymentDate.getMonth() === now.getMonth() && paymentDate.getFullYear() === now.getFullYear()
+  //   })
+  //   .reduce((sum, p) => sum + (typeof p.amount === "number" ? p.amount : Number.parseFloat(p.amount)), 0)
 
-  const totalProcessed = payments.reduce(
-    (sum, p) => sum + (typeof p.amount === "number" ? p.amount : Number.parseFloat(p.amount)),
-    0,
-  )
+  // const totalProcessed = payments.reduce(
+  //   (sum, p) => sum + (typeof p.amount === "number" ? p.amount : Number.parseFloat(p.amount)),
+  //   0,
+  // )
 
   return (
     <div className="space-y-6">
@@ -364,7 +396,7 @@ export function PaymentsManagement() {
             <Receipt className="w-4 h-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{todayPayments}</div>
+            <div className="text-2xl font-bold">{stats.todayPayments.toLocaleString("es-MX")}</div>
             <p className="text-xs text-muted-foreground">Transacciones completadas</p>
           </CardContent>
         </Card>
@@ -374,7 +406,7 @@ export function PaymentsManagement() {
             <TrendingUp className="w-4 h-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${monthlyIncome.toLocaleString()}</div>
+            <div className="text-2xl font-bold">${stats.monthlyIncome.toLocaleString("es-MX")}</div>
             <p className="text-xs text-muted-foreground">Mes actual</p>
           </CardContent>
         </Card>
@@ -384,7 +416,7 @@ export function PaymentsManagement() {
             <Clock className="w-4 h-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{contracts.filter((c) => c.status === "CurrentAndInDebt").length}</div>
+            <div className="text-2xl font-bold">{stats.CurrentAndInDebt.toLocaleString("es-MX")}</div>
             <p className="text-xs text-muted-foreground">Requieren seguimiento</p>
           </CardContent>
         </Card>
@@ -394,7 +426,7 @@ export function PaymentsManagement() {
             <Receipt className="w-4 h-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalProcessed.toLocaleString()}</div>
+            <div className="text-2xl font-bold">${stats.totalProcessed.toLocaleString("es-MX")}</div>
             <p className="text-xs text-muted-foreground">Todos los tiempos</p>
           </CardContent>
         </Card>
@@ -454,11 +486,10 @@ export function PaymentsManagement() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className={`text-xs font-medium px-2 py-1 rounded ${
-                          payment.contractId 
-                            ? "bg-blue-100 text-blue-700" 
+                        <span className={`text-xs font-medium px-2 py-1 rounded ${payment.contractId
+                            ? "bg-blue-100 text-blue-700"
                             : "bg-green-100 text-green-700"
-                        }`}>
+                          }`}>
                           {payment.contractId ? "Contrato" : "Cotización"}
                         </span>
                       </TableCell>
@@ -488,12 +519,13 @@ export function PaymentsManagement() {
                             }}>
                             <Eye className="w-4 h-4" />
                           </Button>
-                          {/* <Button
+                          <Button
                             variant="ghost"
                             size="sm"
-                            className="hover:cursor-pointer">
+                            className="hover:cursor-pointer"
+                            onClick={() => generatePaymentPDF(payment)}>
                             <Download className="w-4 h-4" />
-                          </Button> */}
+                          </Button>
                           {
                             can(systemPermissions, "Edit_Payments") && (
                               <Button

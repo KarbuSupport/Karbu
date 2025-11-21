@@ -21,6 +21,7 @@ export interface PaymentFilters {
     contractId?: number
     quoteId?: number
     responsibleUser?: number
+    search?: string
 }
 
 // CREATE
@@ -110,37 +111,55 @@ export async function createPayment(data: CreatePaymentInput) {
 // READ - Get all payments with filters
 export async function getPayments(filters?: PaymentFilters) {
     try {
+        const where: any = {}
+
+        // Filtrado directo por IDs
+        if (filters?.contractId) where.contractId = filters.contractId
+        if (filters?.quoteId) where.quoteId = filters.quoteId
+        if (filters?.responsibleUser) where.responsibleUser = filters.responsibleUser
+
+        // Filtro de búsqueda
+        if (filters?.search) {
+            const search = filters.search.trim()
+            let numericId: number | undefined
+
+            // Si empieza con PAY-, CNT- o COT-, extraemos el número
+            if (/^(PAY|CNT|COT)-(\d+)$/i.test(search)) {
+                numericId = parseInt(search.split("-")[1])
+            } else if (!isNaN(Number(search))) {
+                numericId = Number(search)
+            }
+
+            where.OR = [
+                { contract: { clientName: { contains: search, mode: "insensitive" } } },
+            ]
+
+            if (numericId !== undefined) {
+                where.OR.push(
+                    { id: numericId },        // ID del pago
+                    { contractId: numericId }, // ID del contrato
+                    { quoteId: numericId }    // ID de la cotización
+                )
+            }
+        }
+
         const payments = await prisma.payment.findMany({
-            where: {
-                ...(filters?.contractId && { contractId: filters.contractId }),
-                ...(filters?.quoteId && { quoteId: filters.quoteId }),
-                ...(filters?.responsibleUser && { responsibleUser: filters.responsibleUser }),
-            },
+            where,
             include: {
-                contract: {
-                    include: {
-                        vehicle: true,
-                        responsible: true,
-                    },
-                },
-                quote: {
-                    include: {
-                        vehicle: true,
-                    },
-                },
+                contract: { include: { vehicle: true, responsible: true } },
+                quote: { include: { vehicle: true } },
                 responsible: true,
             },
-            orderBy: {
-                id: "desc"
-            },
+            orderBy: { id: "desc" },
         })
-        console.log('payments :', payments);
+
         return payments
     } catch (error) {
         console.error("Error fetching payments:", error)
         throw new Error("Failed to fetch payments")
     }
 }
+
 
 // READ - Get single payment
 export async function getPaymentById(id: number) {
@@ -279,5 +298,109 @@ export async function getQuotesAvailableForPayment() {
     } catch (error) {
         console.error("Error fetching available quotes:", error)
         throw new Error("Failed to fetch available quotes")
+    }
+}
+
+export async function getPaymentsStats() {
+    try {
+        const now = new Date()
+
+        const day = now.getDate()
+        const year = now.getFullYear()
+        const monthIndex = now.getMonth()
+
+        const monthNames = [
+            "enero", "febrero", "marzo", "abril", "mayo", "junio",
+            "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+        ]
+        const month = monthNames[monthIndex]
+
+        // 🔹 Obtener todos los pagos
+        const payments = await prisma.payment.findMany()
+
+        // -----------------------------------------
+        //    PAGOS DEL DÍA
+        // -----------------------------------------
+        const todayPayments = payments.filter((p) => {
+            const paymentDate = new Date(p.paymentDate)
+            return paymentDate.toDateString() === now.toDateString()
+        }).length
+
+        // -----------------------------------------
+        //    INGRESOS DEL MES
+        // -----------------------------------------
+        const monthlyIncome = payments
+            .filter((p) => {
+                const paymentDate = new Date(p.paymentDate)
+                return (
+                    paymentDate.getMonth() === monthIndex &&
+                    paymentDate.getFullYear() === year
+                )
+            })
+            .reduce(
+                (sum, p) => sum + (typeof p.amount === "number" ? p.amount : Number.parseFloat(String(p.amount))),
+                0
+            )
+
+        // -----------------------------------------
+        //    TOTAL PROCESADO
+        // -----------------------------------------
+        const totalProcessed = payments.reduce(
+            (sum, p) =>
+                sum + (typeof p.amount === "number" ? p.amount : Number.parseFloat(String(p.amount))),
+            0
+        )
+
+        // -----------------------------------------
+        //    ESTADÍSTICAS DE CONTRATOS
+        // -----------------------------------------
+        const [CurrentAndInDebt] = await Promise.all([
+            //   prisma.contract.count({ where: { status: "CurrentAndPaid" } }),
+            prisma.contract.count({ where: { status: "CurrentAndInDebt" } }),
+            //   prisma.contract.count({ where: { status: "Expired" } }),
+        ])
+
+        // -----------------------------------------
+        //    RESPUESTA FINAL
+        // -----------------------------------------
+        return {
+            success: true,
+            data: {
+                // ===========
+                // Fecha
+                // ===========
+                // day,
+                // month,
+                // year,
+
+                // ===========
+                // Pagos
+                // ===========
+                todayPayments,
+                monthlyIncome,
+                totalProcessed,
+
+                // ===========
+                // Contratos
+                // ===========
+                // CurrentAndPaid,
+                CurrentAndInDebt,
+                // Expired,
+            },
+        }
+    } catch (error: any) {
+        console.error("Error en getPaymentsStatsService:", error)
+        return {
+            success: false,
+            data: {
+                todayPayments: 0,
+                monthlyIncome: 0,
+                totalProcessed: 0,
+                CurrentAndPaid: 0,
+                CurrentAndInDebt: 0,
+                Expired: 0,
+            },
+            error: error?.message || "Error obteniendo estadísticas",
+        }
     }
 }

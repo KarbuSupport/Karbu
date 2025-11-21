@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src
 import { FileText, LucideContrast as FileContract, CreditCard, QrCode } from "lucide-react"
 import { getContractsWithStatusAction } from "../contracts/contract.actions"
 import { useEffect, useState } from "react"
+import { useAuth } from "@/src/shared/context/AuthContext"
+import { can } from "@/src/shared/functions/permissions"
 
 const initialStats = [
   { label: "Contratos Vigentes y Pagados", value: 0, color: "bg-green-500" },
@@ -25,6 +27,7 @@ interface DashboardOverviewProps {
 
 export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
   const [contractStats, setContractStats] = useState(initialStats)
+  const systemPermissions = useAuth().permissions;
   const handleContracts = async () => {
     const result = await getContractsWithStatusAction()
     console.log('result :', result);
@@ -67,63 +70,19 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
           </Card>
         ))}
       </div>
+      <div>
+        {/* Aqui va el char */}
+      </div>
 
-      {/* Recent Activity */}
+      {/* Fast Action */}
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-        {/* <Card>
-          <CardHeader>
-            <CardTitle>Actividad Reciente</CardTitle>
-            <CardDescription>Últimas transacciones y eventos del sistema</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">{activity.type}</p>
-                    <p className="text-sm text-muted-foreground">{activity.client}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">{activity.amount}</p>
-                    <p className="text-sm text-muted-foreground">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card> */}
-
         <Card>
           <CardHeader>
-            <CardTitle>Acciones Rápidas</CardTitle>
-            <CardDescription>Funciones más utilizadas del sistema</CardDescription>
+            <CardTitle>Accion Rápida</CardTitle>
+            {/* <CardDescription>Funciones más utilizadas del sistema</CardDescription> */}
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <Button
-                variant="outline"
-                className="h-20 flex-col bg-transparent hover:cursor-pointer"
-                onClick={() => onSectionChange?.("quotes")}
-              >
-                <FileText className="w-6 h-6 mb-2" />
-                Nueva Cotización
-              </Button>
-              <Button
-                variant="outline"
-                className="h-20 flex-col bg-transparent hover:cursor-pointer"
-                onClick={() => onSectionChange?.("contracts")}
-              >
-                <FileContract className="w-6 h-6 mb-2" />
-                Crear Contrato
-              </Button>
-              <Button
-                variant="outline"
-                className="h-20 flex-col bg-transparent hover:cursor-pointer"
-                onClick={() => onSectionChange?.("payments")}
-              >
-                <CreditCard className="w-6 h-6 mb-2" />
-                Registrar Pago
-              </Button>
+            {can(systemPermissions, "QR_Search") && (<div className="grid grid-cols-1 gap-4">
               <Button
                 variant="outline"
                 className="h-20 flex-col bg-transparent hover:cursor-pointer"
@@ -132,7 +91,7 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
                 <QrCode className="w-6 h-6 mb-2" />
                 Buscar por QR
               </Button>
-            </div>
+            </div>)}
           </CardContent>
         </Card>
       </div>

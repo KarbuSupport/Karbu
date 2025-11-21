@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/src/shared/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
 import { Plus, Trash2 } from "lucide-react"
-import { getVehiclesAction, getServicesAction } from "@/src/features/admin/contracts/contract.actions"
+import { SignaturePad } from "@/src/lib/signature-pad"
+import { getServicesAction, getVehiclesAction } from "./contract.actions"
 
 interface ContractFormModalProps {
   open: boolean
@@ -18,6 +19,8 @@ interface ContractFormModalProps {
   onSubmit: (data: any) => Promise<void>
   initialData?: any
   isLoading?: boolean
+  vehicles?: any[]
+  services?: any[]
 }
 
 export function ContractFormModal({
@@ -27,15 +30,14 @@ export function ContractFormModal({
   initialData,
   isLoading = false,
 }: ContractFormModalProps) {
-  const [vehicles, setVehicles] = useState<any[]>([])
-  const [services, setServices] = useState<any[]>([])
   const [selectedServices, setSelectedServices] = useState<Array<{ serviceId: number; price: number }>>([])
+  const [clientSignature, setClientSignature] = useState<string | null>(null)
+  const [vehicles, setVehicles] = useState<any[]>([])
+  const [services, setServices] = useState<any[]>([]);
+
   const [formData, setFormData] = useState({
-    // Cliente info básica
     clientName: "",
     clientRFC: "",
-
-    // Dirección del cliente
     clientStreet: "",
     clientExteriorNumber: "",
     clientInteriorNumber: "",
@@ -43,16 +45,10 @@ export function ContractFormModal({
     clientPostalCode: "",
     clientCity: "",
     clientState: "Jalisco",
-
-    // Consentimientos
     marketingConsent: false,
     advertisingConsent: false,
-
-    // PROFECO
     profecoNumber: "",
     profecoDate: "",
-
-    // Contrato
     vehicleId: "",
     startDate: "",
     endDate: "",
@@ -61,7 +57,6 @@ export function ContractFormModal({
 
   useEffect(() => {
     if (open) {
-      loadVehiclesAndServices()
       if (initialData) {
         setFormData({
           clientName: initialData.clientName,
@@ -83,18 +78,32 @@ export function ContractFormModal({
           status: initialData.status,
         })
         setSelectedServices(initialData.services || [])
+        setClientSignature(initialData.clientSignature || null)
       }
+      loadVehicles();
+      loadServices();
     }
   }, [open, initialData])
 
-  const loadVehiclesAndServices = async () => {
+  const loadVehicles = async () => {
     try {
-      const [vehiclesRes, servicesRes] = await Promise.all([getVehiclesAction(), getServicesAction()])
-
-      if (vehiclesRes.success) setVehicles(vehiclesRes.data as any)
-      if (servicesRes.success) setServices(servicesRes.data as any)
+      const result = await getVehiclesAction()
+      if (result.success) {
+        setVehicles(result.data as any)
+      }
     } catch (error) {
-      console.error("Error loading data:", error)
+      console.error("Error loading Vehicles", error);
+    }
+  }
+
+  const loadServices = async () => {
+    try {
+      const result = await getServicesAction();
+      if (result.success) {
+        setServices(result.data as any);
+      }
+    } catch (error) {
+      console.error("Error loading Services", error);
     }
   }
 
@@ -137,7 +146,8 @@ export function ContractFormModal({
       endDate: formData.endDate ? new Date(formData.endDate) : undefined,
       profecoDate: formData.profecoDate ? new Date(formData.profecoDate) : undefined,
       services: selectedServices,
-      responsibleUser: 1, // TODO: Get from current user
+      clientSignature: clientSignature,
+      responsibleUser: 1,
     })
   }
 
@@ -181,7 +191,10 @@ export function ContractFormModal({
               </div>
               <div>
                 <Label htmlFor="status">Estado del Contrato *</Label>
-                <Select value={formData.status} onValueChange={(value: any) => setFormData({ ...formData, status: value })}>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value: any) => setFormData({ ...formData, status: value })}
+                >
                   <SelectTrigger id="status">
                     <SelectValue />
                   </SelectTrigger>
@@ -318,7 +331,9 @@ export function ContractFormModal({
                 <Checkbox
                   id="advertisingConsent"
                   checked={formData.advertisingConsent}
-                  onCheckedChange={(checked: any) => setFormData({ ...formData, advertisingConsent: checked as boolean })}
+                  onCheckedChange={(checked: any) =>
+                    setFormData({ ...formData, advertisingConsent: checked as boolean })
+                  }
                 />
                 <Label htmlFor="advertisingConsent" className="hover:cursor-pointer">
                   Autorización para recibir publicidad
@@ -357,11 +372,12 @@ export function ContractFormModal({
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg">Servicios</CardTitle>
               <Button
-              type="button"
-              size="sm"
-              onClick={handleAddService}
-              variant="outline"
-              className="hover:cursor-pointer">
+                type="button"
+                size="sm"
+                onClick={handleAddService}
+                variant="outline"
+                className="hover:cursor-pointer bg-transparent"
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Agregar Servicio
               </Button>
@@ -407,11 +423,12 @@ export function ContractFormModal({
                       />
                     </div>
                     <Button
-                    type="button"
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleRemoveService(index)}
-                    className="hover:cursor-pointer">
+                      type="button"
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleRemoveService(index)}
+                      className="hover:cursor-pointer"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
@@ -420,7 +437,7 @@ export function ContractFormModal({
             </CardContent>
           </Card>
 
-          {/* Dates */}
+          {/* Dates and Signature */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Vigencia del Contrato</CardTitle>
@@ -448,20 +465,27 @@ export function ContractFormModal({
             </CardContent>
           </Card>
 
+          {/* Signature Pad */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Firma del Cliente</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SignaturePad onSignatureChange={setClientSignature} />
+            </CardContent>
+          </Card>
+
           {/* Actions */}
           <div className="flex gap-2 justify-end">
             <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="hover:cursor-pointer">
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="hover:cursor-pointer"
+            >
               Cancelar
             </Button>
-            <Button
-            type="submit"
-            disabled={isLoading}
-            className="hover:cursor-pointer"
-            >
+            <Button type="submit" disabled={isLoading} className="hover:cursor-pointer">
               {isLoading ? "Guardando..." : initialData ? "Actualizar Contrato" : "Crear Contrato"}
             </Button>
           </div>
