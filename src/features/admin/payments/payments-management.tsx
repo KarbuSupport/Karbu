@@ -75,6 +75,7 @@ interface Quote {
 
 export function PaymentsManagement() {
   const systemPermissions = useAuth().permissions;
+  const currentUserId = useAuth().userId;
   const [isNewPaymentOpen, setIsNewPaymentOpen] = useState(false)
   const [payments, setPayments] = useState<Payment[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])
@@ -171,7 +172,7 @@ async function searchPayments(term: string) {
         method: formData.method,
         paymentDate: fixedDate,
         voucherNumber: formData.voucherNumber || undefined,
-        responsibleUser: 1, // TODO: Get from current user context
+        responsibleUser: currentUserId || 1, // TODO: Get from current user context
       })
 
       // Reset form and reload data

@@ -1,22 +1,36 @@
-// context/AuthContext.tsx
 "use client"
-import React, { createContext, useContext, useState } from "react"
+
+import { createContext, useContext } from "react"
 
 interface AuthContextType {
+  userId: number | null
   permissions: string[]
-  setPermissions: (perms: string[]) => void
+  email: string | null
+  name: string | null
 }
 
 const AuthContext = createContext<AuthContextType>({
+  userId: null,
   permissions: [],
-  setPermissions: () => {},
+  email: null,
+  name: null,
 })
 
-export const AuthProvider = ({ children, permissions: initialPermissions }: { children: React.ReactNode; permissions: string[] }) => {
-  const [permissions, setPermissions] = useState<string[]>(initialPermissions)
-
+export function AuthProvider({
+  children,
+  userId,
+  permissions,
+  email,
+  name,
+}: {
+  children: React.ReactNode
+  userId: number | null
+  permissions: string[]
+  email: string | null
+  name: string | null
+}) {
   return (
-    <AuthContext.Provider value={{ permissions, setPermissions }}>
+    <AuthContext.Provider value={{ userId, permissions, email, name }}>
       {children}
     </AuthContext.Provider>
   )
