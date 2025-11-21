@@ -258,7 +258,7 @@ async function searchPayments(term: string) {
                 Registrar Pago
               </Button>)}
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="md:min-w-2xl max-w-2xl">
             <DialogHeader>
               <DialogTitle>Registrar Nuevo Pago</DialogTitle>
               <DialogDescription>Registra un pago para un contrato o cotización existente</DialogDescription>
