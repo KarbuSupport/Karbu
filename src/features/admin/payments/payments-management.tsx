@@ -76,6 +76,7 @@ interface Quote {
 export function PaymentsManagement() {
   const systemPermissions = useAuth().permissions;
   const currentUserId = useAuth().userId;
+  console.log('currentUserId :', currentUserId);
   const [isNewPaymentOpen, setIsNewPaymentOpen] = useState(false)
   const [payments, setPayments] = useState<Payment[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])
@@ -163,8 +164,6 @@ async function searchPayments(term: string) {
 
     const selectedDate = new Date(formData.paymentDate)
     const fixedDate = new Date(selectedDate.getTime() + selectedDate.getTimezoneOffset() * 60000)
-
-    console.log('currentUserId :', currentUserId);
     try {
       await createPaymentAction({
         contractId: isQuotePayment ? undefined : Number.parseInt(formData.contractId),
