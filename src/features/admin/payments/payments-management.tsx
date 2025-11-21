@@ -76,7 +76,6 @@ interface Quote {
 export function PaymentsManagement() {
   const systemPermissions = useAuth().permissions;
   const currentUserId = useAuth().userId;
-  console.log('currentUserId :', currentUserId);
   const [isNewPaymentOpen, setIsNewPaymentOpen] = useState(false)
   const [payments, setPayments] = useState<Payment[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])

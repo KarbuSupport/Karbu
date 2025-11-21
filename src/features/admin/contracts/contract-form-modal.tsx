@@ -17,6 +17,7 @@ interface ContractFormModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (data: any) => Promise<void>
+  currentUserId: number | null
   initialData?: any
   isLoading?: boolean
   vehicles?: any[]
@@ -27,6 +28,7 @@ export function ContractFormModal({
   open,
   onOpenChange,
   onSubmit,
+  currentUserId,
   initialData,
   isLoading = false,
 }: ContractFormModalProps) {
@@ -148,7 +150,7 @@ export function ContractFormModal({
       profecoDate: formData.profecoDate ? new Date(formData.profecoDate) : undefined,
       services: selectedServices,
       clientSignature: clientSignature,
-      responsibleUser: 1,
+      responsibleUser: currentUserId,
     })
   }
 

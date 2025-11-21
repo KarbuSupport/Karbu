@@ -59,6 +59,7 @@ interface Stats {
 
 export function ContractsManagement() {
   const systemPermissions = useAuth().permissions;
+  const currentUserId = useAuth().userId;
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isViewOpen, setIsViewOpen] = useState(false)
   const [contracts, setContracts] = useState<Contract[]>([])
@@ -405,6 +406,7 @@ export function ContractsManagement() {
         onSubmit={editingContract ? handleUpdateContract : handleCreateContract}
         initialData={editingContract}
         isLoading={isSubmitting}
+        currentUserId={currentUserId || null}
       />
 
       <ContractViewModal contract={selectedContract} open={isViewOpen} onOpenChange={setIsViewOpen} />
