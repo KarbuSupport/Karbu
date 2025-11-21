@@ -222,19 +222,30 @@ export class QuoteService {
   /**
    * Get quotes statistics
    */
-  static async getQuotesStats() {
-    const total = await prisma.quote.count()
-    const withPurchaseCheck = await prisma.quote.count({
-      where: { purchaseCheck: true },
-    })
-    const totalEstimate = await prisma.quote.aggregate({
-      _sum: { repairEstimate: true },
-    })
+static async getQuotesStats() {
+  // 1) Total de cotizaciones
+  const totalResult = await prisma.$queryRaw<{ count: number }[]>`
+    SELECT COUNT(*)::int AS count FROM "Quote";
+  `
+  const total = totalResult[0]?.count ?? 0
 
-    return {
-      total,
-      withPurchaseCheck,
-      totalEstimate: totalEstimate._sum.repairEstimate || 0,
-    }
+  // 2) Total con purchaseCheck = true
+  const purchaseCheckResult = await prisma.$queryRaw<{ count: number }[]>`
+    SELECT COUNT(*)::int AS count FROM "Quote" WHERE "purchaseCheck" = true;
+  `
+  const withPurchaseCheck = purchaseCheckResult[0]?.count ?? 0
+
+  // 3) Suma de repairEstimate
+  const estimateResult = await prisma.$queryRaw<{ sum: number | null }[]>`
+    SELECT SUM("repairEstimate") AS sum FROM "Quote";
+  `
+  const totalEstimate = estimateResult[0]?.sum ?? 0
+
+  return {
+    total,
+    withPurchaseCheck,
+    totalEstimate,
   }
+}
+
 }

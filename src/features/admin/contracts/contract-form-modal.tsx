@@ -108,6 +108,7 @@ export function ContractFormModal({
   }
 
   const handleAddService = () => {
+    console.log('services :', services);
     if (services.length > 0) {
       setSelectedServices([
         ...selectedServices,
@@ -153,7 +154,7 @@ export function ContractFormModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="md:min-w-5xl md:max-w-6xl max-w-11/12 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{initialData ? "Editar Contrato" : "Crear Nuevo Contrato"}</DialogTitle>
           <DialogDescription>

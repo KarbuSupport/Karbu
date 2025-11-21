@@ -34,7 +34,7 @@ export function SignaturePad({ onSignatureChange }: SignaturePadProps) {
         <SignatureCanvas
           ref={signaturePadRef}
           canvasProps={{
-            className: "w-full",
+            className: "block",
             width: 600,
             height: 200,
           }}
