@@ -84,7 +84,6 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-
     try {
       const result = quote ? await updateQuoteAction(quote.id, formData) : await createQuoteAction(formData)
 
@@ -103,6 +102,7 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
         }
 
         onSuccess?.()
+        onOpenChange(false)
       } else {
         toast({
           title: "Error",
@@ -140,7 +140,7 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
   }
 
   return (<Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="max-w-5xl max-h-[95vh] p-0 gap-0 bg-gradient-to-br from-background to-muted/20 overflow-auto">
+    <DialogContent className="md:max-w-5xl max-h-[95vh] p-0 gap-0 bg-gradient-to-br from-background to-muted/20 overflow-auto">
       <DialogHeader className="px-6 pt-6 pb-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-primary/10">
@@ -1366,20 +1366,6 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
             >
               Cancelar
             </Button>
-
-            {/* {(savedQuoteId || isEdit) && (
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleGeneratePDF}
-                className="flex-1 h-11 hover:cursor-pointer"
-                disabled={isSubmitting}
-              >
-                <FileText className="mr-2 h-4 w-4" />
-                Generar PDF
-              </Button>
-            )} */}
-
             <Button
             type="submit"
             disabled={isSubmitting}
