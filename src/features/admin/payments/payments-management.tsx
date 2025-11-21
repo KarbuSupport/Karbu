@@ -164,6 +164,7 @@ async function searchPayments(term: string) {
     const selectedDate = new Date(formData.paymentDate)
     const fixedDate = new Date(selectedDate.getTime() + selectedDate.getTimezoneOffset() * 60000)
 
+    console.log('currentUserId :', currentUserId);
     try {
       await createPaymentAction({
         contractId: isQuotePayment ? undefined : Number.parseInt(formData.contractId),
