@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   generator: "",
   icons: {
     icon: "/favicon.ico",
-    apple: "apple-touch-icon.png"
+    apple: "/apple-touch-icon.png"
   }
 }
 
