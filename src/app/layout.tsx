@@ -6,15 +6,22 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Karbu - Tu mecánico de confianza",
   description: "Karbu - Tu mecánico de confianza",
-  generator: "",
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png"
-  }
+    icon: [
+      { url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", rel: "shortcut icon" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180" },
+    ],
+  },
+  manifest: "/site.webmanifest",
 }
+
 
 export default function RootLayout({
   children,
