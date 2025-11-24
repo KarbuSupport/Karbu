@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   description: "Karbu - Tu mecánico de confianza",
   generator: "",
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png"
+    icon: "/public/favicon.ico",
+    apple: "/public/apple-touch-icon.png"
   }
 }
 
