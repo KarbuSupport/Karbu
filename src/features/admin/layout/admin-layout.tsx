@@ -77,9 +77,9 @@ export function AdminLayout({ children, activeSection, onSectionChange }: AdminL
               <Button
                 key={item.id}
                 variant={activeSection === item.id ? "default" : "ghost"}
-                className={`w-full justify-start ${activeSection === item.id
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground hover:cursor-pointer"
-                    : "hover:bg-sidebar-primary hover:text-sidebar-primary-foreground hover:cursor-pointer"
+                className={`w-full justify-start hover:cursor-pointer ${activeSection === item.id
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground "
+                    : "hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
                   }`}
                 onClick={() => {
                   onSectionChange(item.id)

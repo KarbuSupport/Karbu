@@ -83,11 +83,11 @@ export function PaymentsManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [stats, setStats] = useState({
-  CurrentAndInDebt: 0,
-  monthlyIncome: 0,
-  todayPayments: 0,
-  totalProcessed: 0,
-})
+    CurrentAndInDebt: 0,
+    monthlyIncome: 0,
+    todayPayments: 0,
+    totalProcessed: 0,
+  })
 
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
   const [isViewOpen, setIsViewOpen] = useState(false)
@@ -111,13 +111,13 @@ export function PaymentsManagement() {
   }, [])
 
   // Filtrado cuando cambia searchTerm
-useEffect(() => {
-  if (searchTerm.trim() === "") {
-    loadData() // Si el buscador está vacío, mostrar todo
-  } else {
-    searchPayments(searchTerm)
-  }
-}, [searchTerm])
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      loadData() // Si el buscador está vacío, mostrar todo
+    } else {
+      searchPayments(searchTerm)
+    }
+  }, [searchTerm])
 
   async function loadData() {
     try {
@@ -140,17 +140,17 @@ useEffect(() => {
   }
 
   // Búsqueda de pagos según searchTerm
-async function searchPayments(term: string) {
-  try {
-    setIsLoading(true)
-    const paymentsData = await getPaymentsAction({ search: term })
-    setPayments(paymentsData)
-  } catch (error) {
-    console.error("Error searching payments:", error)
-  } finally {
-    setIsLoading(false)
+  async function searchPayments(term: string) {
+    try {
+      setIsLoading(true)
+      const paymentsData = await getPaymentsAction({ search: term })
+      setPayments(paymentsData)
+    } catch (error) {
+      console.error("Error searching payments:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
-}
 
   async function handleCreatePayment() {
     const isQuotePayment = formData.paymentType === "quote"
@@ -362,7 +362,7 @@ async function searchPayments(term: string) {
                   onChange={(e) => setFormData({ ...formData, voucherNumber: e.target.value })}
                 />
               </div>
-              <div className="col-span-2">
+              {/* <div className="col-span-2">
                 <Label htmlFor="payment-notes">Notas</Label>
                 <Textarea
                   id="payment-notes"
@@ -370,7 +370,7 @@ async function searchPayments(term: string) {
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 />
-              </div>
+              </div> */}
               <div className="col-span-2 flex gap-2">
                 <Button
                   onClick={() => setIsNewPaymentOpen(false)}
@@ -487,13 +487,13 @@ async function searchPayments(term: string) {
                       </TableCell>
                       <TableCell>
                         <span className={`text-xs font-medium px-2 py-1 rounded ${payment.contractId
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-green-100 text-green-700"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
                           }`}>
                           {payment.contractId ? "Contrato" : "Cotización"}
                         </span>
                       </TableCell>
-                      <TableCell>{payment.contractId ? `CNT-${payment.contractId}` : `COT-${payment.quoteId}`}</TableCell>
+                      <TableCell>{payment.contractId ? `CNT-${payment.contractId}` : `QTZ-${payment.quoteId}`}</TableCell>
                       <TableCell className="font-medium">
                         $
                         {typeof payment.amount === "number"
@@ -567,11 +567,17 @@ async function searchPayments(term: string) {
 
       {selectedPayment && (
         <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Ver Detalles del Pago</DialogTitle>
             </DialogHeader>
             <PaymentViewReadOnly payment={selectedPayment} />
+            <Button
+              onClick={() => setIsViewOpen(false)}
+              variant="outline"
+              className="flex-1 hover:cursor-pointer">
+              Cancelar
+            </Button>
           </DialogContent>
         </Dialog>
       )}

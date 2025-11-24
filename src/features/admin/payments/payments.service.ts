@@ -123,8 +123,8 @@ export async function getPayments(filters?: PaymentFilters) {
             const search = filters.search.trim()
             let numericId: number | undefined
 
-            // Si empieza con PAY-, CNT- o COT-, extraemos el número
-            if (/^(PAY|CNT|COT)-(\d+)$/i.test(search)) {
+            // Si empieza con PAY-, CNT- COT- o QTZ-, extraemos el número
+            if (/^(PAY|CNT|COT|QTZ)-(\d+)$/i.test(search)) {
                 numericId = parseInt(search.split("-")[1])
             } else if (!isNaN(Number(search))) {
                 numericId = Number(search)
@@ -293,7 +293,6 @@ export async function getQuotesAvailableForPayment() {
                 Payment: true
             },
         })
-        console.log('quotes :', quotes);
         return quotes
     } catch (error) {
         console.error("Error fetching available quotes:", error)

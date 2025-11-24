@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Dialog,
   DialogContent,
@@ -50,14 +50,40 @@ export function PaymentEditModal({
 }: PaymentEditModalProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
   const [formData, setFormData] = useState({
-    amount: typeof payment.amount === "number" 
-      ? payment.amount.toString() 
-      : payment.amount.toString(),
-    method: payment.method,
-    paymentDate: new Date(payment.paymentDate).toISOString().split('T')[0],
+  amount: "",
+  method: "",
+  paymentDate: "",
+  voucherNumber: "",
+})
+
+useEffect(() => {
+  if (!payment) return
+
+  setFormData({
+    amount:
+      typeof payment.amount === "number"
+        ? payment.amount.toString()
+        : payment.amount.toString(),
+    method: payment.method || "",
+    paymentDate: new Date(payment.paymentDate)
+      .toISOString()
+      .split("T")[0],
     voucherNumber: payment.voucherNumber || "",
   })
+}, [payment, open])
+
+
+  
+  // const [formData, setFormData] = useState({
+  //   amount: typeof payment.amount === "number" 
+  //     ? payment.amount.toString() 
+  //     : payment.amount.toString(),
+  //   method: payment.method,
+  //   paymentDate: new Date(payment.paymentDate).toISOString().split('T')[0],
+  //   voucherNumber: payment.voucherNumber || "",
+  // })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,13 +110,13 @@ export function PaymentEditModal({
         })
       } else {
         // Default implementation - you need to connect this to your server action
-        console.log("Payment update submitted:", {
-          id: payment.id,
-          amount: Number.parseFloat(formData.amount),
-          method: formData.method,
-          paymentDate: fixedDate,
-          voucherNumber: formData.voucherNumber || undefined,
-        })
+        // console.log("Payment update submitted:", {
+        //   id: payment.id,
+        //   amount: Number.parseFloat(formData.amount),
+        //   method: formData.method,
+        //   paymentDate: fixedDate,
+        //   voucherNumber: formData.voucherNumber || undefined,
+        // })
       }
 
       onOpenChange(false)
@@ -117,7 +143,7 @@ export function PaymentEditModal({
           <div className="bg-muted px-3 py-2 rounded-md space-y-2">
             <div className="text-sm">
               <span className="text-muted-foreground">Contrato:</span>
-              <p className="font-semibold">{payment.contractId || "N/A"}</p>
+              <p className="font-semibold">{`CNT-${payment.contractId}` || "N/A"}</p>
             </div>
             <div className="text-sm">
               <span className="text-muted-foreground">Cliente:</span>
@@ -197,13 +223,13 @@ export function PaymentEditModal({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
-              className="flex-1"
+              className="flex-1 hover:cursor-pointer"
             >
               Cancelar
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-accent hover:bg-accent/90"
+              className="flex-1 bg-accent hover:bg-accent/90 hover:cursor-pointer"
               disabled={isLoading}
             >
               {isLoading ? "Guardando..." : "Guardar Cambios"}

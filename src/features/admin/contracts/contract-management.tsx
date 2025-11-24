@@ -140,7 +140,6 @@ export function ContractsManagement() {
   }
 
   const handleUpdateContract = async (data: any) => {
-  console.log('data :', data);
     if (!editingContract) return
     setIsSubmitting(true)
     try {
@@ -194,9 +193,9 @@ export function ContractsManagement() {
 
     // Si tiene qrId pero no qrCode, generamos QR
     if (contract.qrCode) {
-      const { qrBase64 } = await generateQrImg(contract.qrCode)
+      const { qrBase64, qrId } = await generateQrImg(contract.qrCode)
       contractWithQr.qrCode = qrBase64.replace(/^data:image\/png;base64,/, "")
-      // contractWithQr.qrCode = qrBase64
+      contractWithQr.qrCodeId = qrId
     }
 
     downloadContractPDF(contractWithQr)
@@ -211,15 +210,15 @@ export function ContractsManagement() {
         </div>
         {can(systemPermissions, "Create_Contracts") && (
           <Button
-          className="bg-accent hover:bg-accent/90 hover:cursor-pointer"
-          onClick={() => {
-            setEditingContract(null)
-            setIsFormOpen(true)
-          }}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Nuevo Contrato
-        </Button>)}
+            className="bg-accent hover:bg-accent/90 hover:cursor-pointer"
+            onClick={() => {
+              setEditingContract(null)
+              setIsFormOpen(true)
+            }}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Nuevo Contrato
+          </Button>)}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -261,14 +260,14 @@ export function ContractsManagement() {
             <CardTitle>Todos los Contratos</CardTitle>
             <div className="flex items-center space-x-2">
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40 hover:cursor-pointer">
                   <SelectValue placeholder="Filtrar estado" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="CurrentAndPaid">Vigente y pagado</SelectItem>
-                  <SelectItem value="CurrentAndInDebt">Vigente y con deuda</SelectItem>
-                  <SelectItem value="Expired">Vencido</SelectItem>
+                  <SelectItem className="hover:cursor-pointer" value="all">Todos</SelectItem>
+                  <SelectItem className="hover:cursor-pointer" value="CurrentAndPaid">Vigente y pagado</SelectItem>
+                  <SelectItem className="hover:cursor-pointer" value="CurrentAndInDebt">Vigente y con deuda</SelectItem>
+                  <SelectItem className="hover:cursor-pointer" value="Expired">Vencido</SelectItem>
                 </SelectContent>
               </Select>
               <Input
@@ -278,9 +277,9 @@ export function ContractsManagement() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               <Button
-              variant="outline" 
-              size="sm"
-              className="hover:cursor-pointer">
+                variant="outline"
+                size="sm"
+                className="hover:cursor-pointer">
                 <Search className="w-4 h-4" />
               </Button>
             </div>
@@ -335,13 +334,11 @@ export function ContractsManagement() {
                       <TableCell className="font-bold">${totalPrice.toLocaleString()}</TableCell>
                       <TableCell>
                         <Badge
-                          variant={
-                            contract.status === "CurrentAndInDebt"
-                              ? "default"
-                              : contract.status === "Expired"
-                                ? "destructive"
-                                : "secondary"
-                          }
+                          className={contract.status === "Expired"
+                            ? "bg-destructive"
+                            : contract.status === "CurrentAndInDebt"
+                              ? "bg-amber-400"
+                              : "bg-secondary"}
                         >
                           {handleStatusNames(contract.status)}
                         </Badge>
@@ -368,27 +365,27 @@ export function ContractsManagement() {
                           </Button>
                           {
                             can(systemPermissions, "Edit_Contracts") && (
-                              <Button 
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditContract(contract)}
-                              title="Editar"
-                              className="hover:cursor-pointer">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditContract(contract)}
+                                title="Editar"
+                                className="hover:cursor-pointer">
                                 <Edit className="w-4 h-4" />
                               </Button>
                             )}
 
                           {can(systemPermissions, "Delete_Contracts") && (
                             <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteContract(contract.id)}
-                            className="text-red-500 hover:text-red-700 hover:cursor-pointer"
-                            title="Eliminar"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteContract(contract.id)}
+                              className="text-red-500 hover:text-red-700 hover:cursor-pointer"
+                              title="Eliminar"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>

@@ -36,7 +36,7 @@ export async function generateQrImg(qrId: string) {
       },
     })
 
-    return { qrBase64 };
+    return { qrBase64, qrId };
   } catch (error) {
     console.error("Error generando QR:", error)
     throw new Error("No se pudo generar el código QR")

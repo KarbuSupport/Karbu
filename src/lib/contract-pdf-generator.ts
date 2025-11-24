@@ -1,7 +1,6 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 export async function downloadContractPDF(contract: any) {
-  console.log('contract :', contract);
   const pdfUrls = [
     "/plantillas/contrato_pagina1.pdf",
     "/plantillas/contrato_pagina2.pdf",
@@ -146,6 +145,13 @@ if (contract.qrCode) {
     width: qrDims.width,
     height: qrDims.height,
   });
+  currentPage.drawText(contract.qrCodeId, {
+    x: width - qrDims.width - 33,
+    y: 47,
+    size: 3.5,
+    font: helvetica,
+    color: rgb(0, 0, 0)
+  })
 }
 
 }

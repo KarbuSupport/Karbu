@@ -30,7 +30,6 @@ export function DashboardOverview({ onSectionChange }: DashboardOverviewProps) {
   const systemPermissions = useAuth().permissions;
   const handleContracts = async () => {
     const result = await getContractsWithStatusAction()
-    console.log('result :', result);
     if (result.success && result.data) {
       const statusGroups = result.data
       setContractStats([

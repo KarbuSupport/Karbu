@@ -100,12 +100,12 @@ console.log('payment :', payment);
   addDataBlock([
     [`Monto: $${Number(payment.amount).toFixed(2)} MXN`, ``],
     [`Método de Pago: ${payment.method}`, ``],
-    [`Referencia: ${payment.voucherNumber || "N/A"}`, ``],
+    [`Referencia / Folio: ${payment.voucherNumber || "N/A"}`, ``],
     [
       `Aplicado a: ${
         payment.contractId
-          ? `Contrato #${payment.contractId}`
-          : `Cotización #${payment.quoteId}`
+          ? `Contrato CNT-${payment.contractId}`
+          : `Cotización QTZ-${payment.quoteId}`
       }`,
       ``,
     ],

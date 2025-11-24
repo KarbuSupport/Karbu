@@ -15,7 +15,6 @@ interface ContractViewModalProps {
 }
 
 export function ContractViewModal({ contract, open, onOpenChange }: ContractViewModalProps) {
-  console.log('contract :', contract);
   if (!contract) return null
 
   const totalPrice =
@@ -68,12 +67,11 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
               <div>
                 <p className="text-sm text-muted-foreground">Estado</p>
                 <Badge
-                  variant={
-                    contract.status === "Vigente"
-                      ? "default"
-                      : contract.status === "Vencido"
-                        ? "destructive"
-                        : "secondary"
+                  className={ contract.status === "Expired"
+                    ? "bg-destructive"
+                    : contract.status === "CurrentAndInDebt"
+                      ? "bg-amber-400"
+                      : "bg-secondary"
                   }
                 >
                   {handleStatusNames(contract.status)}
@@ -244,15 +242,15 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
           {/* Actions */}
           <div className="flex gap-2 justify-end">
             <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="hover:cursor-pointer">
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="hover:cursor-pointer">
               <X className="w-4 h-4 mr-2" />
               Cerrar
             </Button>
             <Button
-            onClick={() => downloadContractPDF(contract)}
-            className="hover:cursor-pointer">
+              onClick={() => downloadContractPDF(contract)}
+              className="hover:cursor-pointer">
               <Download className="w-4 h-4 mr-2" />
               Descargar PDF
             </Button>

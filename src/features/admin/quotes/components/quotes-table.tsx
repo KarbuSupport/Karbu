@@ -196,11 +196,13 @@ export function QuotesTable({ quotes, onEdit, onRefresh }: QuotesTableProps) {
             <AlertDialogDescription>
               Esta acción no se puede deshacer. Se eliminará permanentemente la cotización y todos sus datos
               relacionados.
+              <br />
+              <span className="text-red-500 font-semibold mt-2 block">Esta acción no se puede deshacer.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+            <AlertDialogCancel className="hover:cursor-pointer">Cancelar</AlertDialogCancel>
+            <AlertDialogAction className={isDeleting ? "disabled" : "hover:cursor-pointer"} onClick={handleDelete} disabled={isDeleting}>
               {isDeleting ? "Eliminando..." : "Eliminar"}
             </AlertDialogAction>
           </AlertDialogFooter>

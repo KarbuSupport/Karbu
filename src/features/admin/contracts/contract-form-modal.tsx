@@ -110,7 +110,6 @@ export function ContractFormModal({
   }
 
   const handleAddService = () => {
-    console.log('services :', services);
     if (services.length > 0) {
       setSelectedServices([
         ...selectedServices,
