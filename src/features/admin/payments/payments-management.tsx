@@ -213,7 +213,6 @@ export function PaymentsManagement() {
 
   async function handleDeletePayment(paymentId: number) {
     try {
-      console.log("[v0] Deleting payment:", paymentId)
       await deletePaymentAction(paymentId)
       setIsDeleteConfirmOpen(false)
       setPaymentToDelete(null)

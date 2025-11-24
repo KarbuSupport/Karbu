@@ -108,7 +108,6 @@ export function QRSearch() {
             setError("Por favor ingresa un código QR válido")
             return
         }
-
         setIsLoading(true)
         setError(null)
 
@@ -137,7 +136,7 @@ export function QRSearch() {
             })
 
         } catch (err) {
-            console.error("[v0] Error searching contract:", err)
+            console.error("Error searching contract:", err)
             setError("Error al buscar el contrato")
             setQrSearchResult(null)
         } finally {
@@ -182,7 +181,7 @@ export function QRSearch() {
                 },
             )
         } catch (err) {
-            console.error("[v0] Error starting scanner:", err)
+            console.error("Error starting scanner:", err)
             setError("No se pudo acceder a la cámara. Verifica los permisos.")
             setIsScanning(false)
             toast({
@@ -225,7 +224,7 @@ export function QRSearch() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold">Búsqueda por Código QR</h1>
-                    <p className="text-muted-foreground">Busca contratos utilizando códigos QR o ID de contrato</p>
+                    <p className="text-muted-foreground">Busca contratos utilizando códigos QR de contrato</p>
                 </div>
             </div>
 
@@ -237,15 +236,15 @@ export function QRSearch() {
                             <Search className="w-5 h-5 mr-2" />
                             Búsqueda Manual
                         </CardTitle>
-                        <CardDescription>Ingresa el código QR o ID del contrato</CardDescription>
+                        <CardDescription>Ingresa el código QR del contrato</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div>
-                            <Label htmlFor="qr-input">Código QR o ID de Contrato</Label>
+                            <Label htmlFor="qr-input">Código QR de Contrato</Label>
                             <div className="flex space-x-2">
                                 <Input
                                     id="qr-input"
-                                    placeholder="Ej: QR-CNT-2024-001"
+                                    placeholder="Ej: QrCNT_k4R#2025-001"
                                     value={qrSearchQuery}
                                     onChange={(e) => setQrSearchQuery(e.target.value)}
                                     onKeyPress={(e) => e.key === "Enter" && handleManualSearch()}

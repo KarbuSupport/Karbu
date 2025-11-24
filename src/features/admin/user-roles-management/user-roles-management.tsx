@@ -375,10 +375,17 @@ export function RolesManagement() {
                   )}
                   <DialogContent className="max-w-md">
                     <DialogHeader>
-                      <DialogTitle>{editingUser ? "Editar" : "Crear"} Usuario del Sistema</DialogTitle>
-                      <DialogDescription>
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <FileText className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <DialogTitle>{editingUser ? "Editar" : "Crear"} Usuario del Sistema</DialogTitle>
+                        </div>
+                      </div>
+                      {/* <DialogDescription>
                         {editingUser ? "Modifica" : "Agrega"} un usuario con acceso al panel administrativo
-                      </DialogDescription>
+                      </DialogDescription> */}
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>

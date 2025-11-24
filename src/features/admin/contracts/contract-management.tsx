@@ -7,7 +7,7 @@ import { Input } from "@/src/shared/components/ui/input"
 import { Badge } from "@/src/shared/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/shared/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/shared/components/ui/select"
-import { Plus, CheckCircle, Clock, AlertTriangle, Search, Download, Eye, Edit, Trash2 } from "lucide-react"
+import { Plus, CheckCircle, Clock, AlertTriangle, Search, Download, Eye, Edit, Trash2, Contact } from "lucide-react"
 import {
   getContractsAction,
   createContractAction,
@@ -24,6 +24,8 @@ import { downloadContractPDF } from "@/src/lib/contract-pdf-generator"
 import { generateQrImg, generateQrWithId } from "@/src/lib/generateQr"
 import { can } from "@/src/shared/functions/permissions"
 import { useAuth } from "@/src/shared/context/AuthContext"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from "@radix-ui/react-alert-dialog"
+import { AlertDialogHeader } from "@/src/shared/components/ui/alert-dialog"
 
 interface Contract {
   id: number
@@ -74,6 +76,8 @@ export function ContractsManagement() {
   const [filterStatus, setFilterStatus] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [contractToDelete, setContractToDelete] = useState<Contract | null>(null)
 
   useEffect(() => {
     loadContracts();
@@ -169,10 +173,9 @@ export function ContractsManagement() {
     }
   }
 
-  const handleDeleteContract = async (id: number) => {
-    if (confirm("¿Estás seguro de que deseas eliminar este contrato?")) {
+  const handleDeleteContract = async (contractId: number) => {
       try {
-        const result = await deleteContractAction(id)
+        const result = await deleteContractAction(contractId)
         if (result.success) {
           loadContracts()
           loadStats()
@@ -180,7 +183,6 @@ export function ContractsManagement() {
       } catch (error) {
         console.error("Error deleting contract:", error)
       }
-    }
   }
 
   const handleEditContract = (contract: Contract) => {
@@ -202,6 +204,7 @@ export function ContractsManagement() {
   }
 
   return (
+    <>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -379,7 +382,10 @@ export function ContractsManagement() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleDeleteContract(contract.id)}
+                              onClick={() => {
+                                setContractToDelete(contract)
+                                setIsDeleteConfirmOpen(true)
+                              }}
                               className="text-red-500 hover:text-red-700 hover:cursor-pointer"
                               title="Eliminar"
                             >
@@ -407,6 +413,30 @@ export function ContractsManagement() {
       />
 
       <ContractViewModal contract={selectedContract} open={isViewOpen} onOpenChange={setIsViewOpen} />
+               <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar Pago</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que deseas eliminar el contrato CNT-{contractToDelete?.id}?
+              <br />
+              <span className="text-red-500 font-semibold mt-2 block">Esta acción no se puede deshacer.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-4">
+            <AlertDialogCancel className="flex-1 hover:cursor-pointer">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => contractToDelete && handleDeleteContract(contractToDelete.id)}
+              className="flex-1 bg-red-500 hover:bg-red-600 hover:cursor-pointer"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
+      </>
   )
 }

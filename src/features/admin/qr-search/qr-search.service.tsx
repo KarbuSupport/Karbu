@@ -30,7 +30,7 @@ export async function searchContractByQR(qrCode: string) {
 
     return { success: true, data: contract }
   } catch (error) {
-    console.error("[v0] Error searching contract by QR:", error)
+    console.error("Error searching contract by QR:", error)
     return { success: false, error: "Error al buscar el contrato" }
   }
 }
@@ -59,7 +59,7 @@ export async function getAllContracts() {
 
     return { success: true, data: contracts }
   } catch (error) {
-    console.error("[v0] Error fetching contracts:", error)
+    console.error("Error fetching contracts:", error)
     return { success: false, error: "Error al obtener los contratos" }
   }
 }

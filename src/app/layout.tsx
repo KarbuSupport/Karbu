@@ -10,6 +10,10 @@ export const metadata: Metadata = {
   title: "Karbu - Tu mecánico de confianza",
   description: "Karbu - Tu mecánico de confianza",
   generator: "",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "apple-touch-icon.png"
+  }
 }
 
 export default function RootLayout({
