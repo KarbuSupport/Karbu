@@ -150,9 +150,9 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
             <DialogTitle className="text-2xl font-bold">
               {quote ? "Editar Cotización" : "Nueva Cotización"}
             </DialogTitle>
-            <DialogDescription className="text-sm mt-1">
+            {/* <DialogDescription className="text-sm mt-1">
               {quote ? "Actualiza los datos de la cotización" : "Completa los datos para crear una nueva cotización"}
-            </DialogDescription>
+            </DialogDescription> */}
           </div>
         </div>
       </DialogHeader>

@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/src/shared/components/ui/dialog"
-import { Plus, Receipt, TrendingUp, Clock, Search, Eye, Edit, Download, Trash2 } from 'lucide-react'
+import { Plus, Receipt, TrendingUp, Clock, Search, Eye, Edit, Download, Trash2, FileText } from 'lucide-react'
 import {
   getPaymentsAction,
   createPaymentAction,
@@ -260,8 +260,15 @@ export function PaymentsManagement() {
           </DialogTrigger>
           <DialogContent className="md:min-w-2xl max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Registrar Nuevo Pago</DialogTitle>
-              <DialogDescription>Registra un pago para un contrato o cotización existente</DialogDescription>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <FileText className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <DialogTitle>Registrar Nuevo Pago</DialogTitle>
+                </div>
+              </div>
+              {/* <DialogDescription>Registra un pago para un contrato o cotización existente</DialogDescription> */}
             </DialogHeader>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
@@ -439,7 +446,7 @@ export function PaymentsManagement() {
             <div className="flex items-center space-x-2">
               <Input
                 placeholder="Buscar pagos..."
-                className="w-64"
+                className="max-w-64"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -569,7 +576,13 @@ export function PaymentsManagement() {
         <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Ver Detalles del Pago</DialogTitle>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Eye className="h-5 w-5 text-primary" />
+                </div>
+                <DialogTitle className="text-2xl font-bold">Detalles del Pago PAY-{selectedPayment.id}</DialogTitle>
+              </div>
+
             </DialogHeader>
             <PaymentViewReadOnly payment={selectedPayment} />
             <Button

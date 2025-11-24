@@ -82,7 +82,7 @@ export function QuotesManagement() {
           onClick={() => setIsModalOpen(true)}
           className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
           <Plus className="w-4 h-4 mr-2" />
-          Nueva Cotización
+          Crear Nueva Cotización
         </Button>)}
       </div>
 

@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/src/shared/components/ui/button"
 import { Badge } from "@/src/shared/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
-import { Download, X } from "lucide-react"
+import { Download, Eye, X } from "lucide-react"
 import { downloadContractPDF } from "@/src/lib/contract-pdf-generator"
 import { QrViewer } from "@/src/shared/hooks/QrViewer"
 
@@ -36,8 +36,13 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Detalles del Contrato CNT-{contract.id}</DialogTitle>
-          <DialogDescription>Información completa del contrato y servicios</DialogDescription>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Eye className="h-5 w-5 text-primary" />
+            </div>
+            <DialogTitle className="text-2xl font-bold">Detalles del Contrato CNT-{contract.id}</DialogTitle>
+            {/* <DialogDescription>Información completa del contrato y servicios</DialogDescription> */}
+          </div>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -67,7 +72,7 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
               <div>
                 <p className="text-sm text-muted-foreground">Estado</p>
                 <Badge
-                  className={ contract.status === "Expired"
+                  className={contract.status === "Expired"
                     ? "bg-destructive"
                     : contract.status === "CurrentAndInDebt"
                       ? "bg-amber-400"
@@ -148,7 +153,7 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
               <CardTitle className="text-lg">Consentimientos</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-4 border rounded-xl bg-muted/30 flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">
                     Autorización para uso de datos mercadotécnicos

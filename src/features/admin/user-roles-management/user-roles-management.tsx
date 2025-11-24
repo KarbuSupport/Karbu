@@ -321,26 +321,26 @@ export function RolesManagement() {
       <Tabs defaultValue={
         can(systemPermissions, "View_Users")
           ? "system-users"
-          : can(systemPermissions,"View_Roles_and_Permissions")
+          : can(systemPermissions, "View_Roles_and_Permissions")
             ? "roles"
-            : can(systemPermissions,"View_Roles_and_Permissions")
+            : can(systemPermissions, "View_Roles_and_Permissions")
               ? "permissions"
               : undefined
       } className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          {can(systemPermissions,"View_Users") && (
+          {can(systemPermissions, "View_Users") && (
             <TabsTrigger value="system-users" className="hover:cursor-pointer">Usuarios</TabsTrigger>
           )}
-          {can(systemPermissions,"View_Roles_and_Permissions") && (
+          {can(systemPermissions, "View_Roles_and_Permissions") && (
             <TabsTrigger value="roles" className="hover:cursor-pointer">Roles</TabsTrigger>
           )}
-          {can(systemPermissions,"View_Roles_and_Permissions") && (
+          {can(systemPermissions, "View_Roles_and_Permissions") && (
             <TabsTrigger value="permissions" className="hover:cursor-pointer">Permisos</TabsTrigger>
           )}
         </TabsList>
 
         {/* Usuarios del Sistema */}
-        {can(systemPermissions,"View_Users") && (
+        {can(systemPermissions, "View_Users") && (
           <>
             <TabsContent value="system-users" className="space-y-6">
               <div className="flex items-center justify-between">
@@ -365,13 +365,13 @@ export function RolesManagement() {
                     }
                   }}
                 >
-                  {can(systemPermissions,"Create_Users") && (
-                  <DialogTrigger asChild>
-                    <Button className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Nuevo Usuario Sistema
-                    </Button>
-                  </DialogTrigger>
+                  {can(systemPermissions, "Create_Users") && (
+                    <DialogTrigger asChild>
+                      <Button className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Nuevo Usuario Sistema
+                      </Button>
+                    </DialogTrigger>
                   )}
                   <DialogContent className="max-w-md">
                     <DialogHeader>
@@ -448,14 +448,14 @@ export function RolesManagement() {
                       </div>
                       <div className="flex gap-2">
                         <Button
-                        onClick={() => setIsNewSystemUserOpen(false)}
-                        variant="outline"
-                        className="flex-1 hover:cursor-pointer">
+                          onClick={() => setIsNewSystemUserOpen(false)}
+                          variant="outline"
+                          className="flex-1 hover:cursor-pointer">
                           Cancelar
                         </Button>
                         <Button
-                        onClick={handleUserSubmit}
-                        className="flex-1 bg-accent hover:bg-accent/90 hover:cursor-pointer">
+                          onClick={handleUserSubmit}
+                          className="flex-1 bg-accent hover:bg-accent/90 hover:cursor-pointer">
                           {editingUser ? "Actualizar" : "Crear"} Usuario
                         </Button>
                       </div>
@@ -469,11 +469,11 @@ export function RolesManagement() {
                   <div className="flex items-center justify-between">
                     <CardTitle>Usuarios Activos</CardTitle>
                     <div className="flex items-center space-x-2">
-                      <Input placeholder="Buscar usuarios del sistema..." className="w-64" />
+                      <Input placeholder="Buscar usuarios del sistema..." className="max-w-64" />
                       <Button
-                      variant="outline"
-                      size="sm"
-                      className="hover:cursor-pointer">
+                        variant="outline"
+                        size="sm"
+                        className="hover:cursor-pointer">
                         <Search className="w-4 h-4" />
                       </Button>
                     </div>
@@ -487,7 +487,7 @@ export function RolesManagement() {
                         <TableHead>Rol</TableHead>
                         <TableHead>Permisos</TableHead>
                         <TableHead>Fecha Creación</TableHead>
-                        {(can(systemPermissions,"Edit_Users") || can(systemPermissions,"Delete_Users")) && (
+                        {(can(systemPermissions, "Edit_Users") || can(systemPermissions, "Delete_Users")) && (
                           <TableHead>Acciones</TableHead>
                         )}
                       </TableRow>
@@ -514,30 +514,30 @@ export function RolesManagement() {
                             </div>
                           </TableCell>
                           <TableCell className="text-sm">{user.createdAt ? user.createdAt.toLocaleDateString() : ""}</TableCell>
-                          {(can(systemPermissions,"Edit_Users") || can(systemPermissions,"Delete_Users")) && (
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              {can(systemPermissions,"Edit_Users") && (
-                              <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditUser(user)}
-                              className="hover:cursor-pointer">
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              )}
-                              {can(systemPermissions,"Delete_Users") && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:cursor-pointer"
-                                onClick={() => handleDeleteUser(user.id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                              )}
-                            </div>
-                          </TableCell>
+                          {(can(systemPermissions, "Edit_Users") || can(systemPermissions, "Delete_Users")) && (
+                            <TableCell>
+                              <div className="flex space-x-2">
+                                {can(systemPermissions, "Edit_Users") && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleEditUser(user)}
+                                    className="hover:cursor-pointer">
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                )}
+                                {can(systemPermissions, "Delete_Users") && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-destructive hover:cursor-pointer"
+                                    onClick={() => handleDeleteUser(user.id)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </TableCell>
                           )}
                         </TableRow>
                       ))}
@@ -549,7 +549,7 @@ export function RolesManagement() {
           </>
         )}
 
-        {can(systemPermissions,"View_Roles_and_Permissions") && (
+        {can(systemPermissions, "View_Roles_and_Permissions") && (
           <>
             {/* Roles */}
             <TabsContent value="roles" className="space-y-6">
@@ -572,10 +572,10 @@ export function RolesManagement() {
                   <DialogTrigger asChild>
                     {can(systemPermissions, "Create_Roles_and_Permissions") && (
                       <Button
-                      className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Nuevo Rol
-                    </Button>)}
+                        className="bg-accent hover:bg-accent/90 hover:cursor-pointer">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Nuevo Rol
+                      </Button>)}
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
@@ -612,7 +612,7 @@ export function RolesManagement() {
                                 id={`permission-${permission.id}`}
                                 checked={selectedPermissions.includes(permission.id)}
                                 onCheckedChange={() => togglePermission(permission.id)}
-                                disabled={!can(systemPermissions,"Create_Roles_and_Permissions") || !can(systemPermissions, "Edit_Roles_and_Permissions")}
+                                disabled={!can(systemPermissions, "Create_Roles_and_Permissions") || !can(systemPermissions, "Edit_Roles_and_Permissions")}
                               />
                               <Label htmlFor={`permission-${permission.id}`} className="text-sm cursor-pointer">
                                 {permission.name}
@@ -623,14 +623,14 @@ export function RolesManagement() {
                       </div>
                       <div className="flex gap-2">
                         <Button
-                        onClick={() => setIsNewRoleOpen(false)}
-                        variant="outline"
-                        className="flex-1 hover:cursor-pointer">
+                          onClick={() => setIsNewRoleOpen(false)}
+                          variant="outline"
+                          className="flex-1 hover:cursor-pointer">
                           Cancelar
                         </Button>
                         <Button
-                        onClick={handleRoleSubmit}
-                        className="flex-1 bg-accent hover:bg-accent/90 hover:cursor-pointer">
+                          onClick={handleRoleSubmit}
+                          className="flex-1 bg-accent hover:bg-accent/90 hover:cursor-pointer">
                           {editingRole ? "Actualizar" : "Crear"} Rol
                         </Button>
                       </div>
@@ -670,25 +670,25 @@ export function RolesManagement() {
                         <div className="flex space-x-2 pt-2">
                           {can(systemPermissions, "Edit_Roles_and_Permissions") && (
                             <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 bg-transparent hover:cursor-pointer"
-                            onClick={() => handleEditRole(role)}
-                          >
-                            <Edit className="w-3 h-3 mr-1" />
-                            Editar
-                          </Button>)}
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 bg-transparent hover:cursor-pointer"
+                              onClick={() => handleEditRole(role)}
+                            >
+                              <Edit className="w-3 h-3 mr-1" />
+                              Editar
+                            </Button>)}
                           {can(systemPermissions, "Delete_Roles_and_Permissions") && (
                             <Button
-                            variant="outline"
-                            size="sm"
-                            className={
-                              `${"text-destructive bg-transparent hover:cursor-pointer "}
+                              variant="outline"
+                              size="sm"
+                              className={
+                                `${"text-destructive bg-transparent hover:cursor-pointer "}
                               ${!can(systemPermissions, "Edit_Roles_and_Permissions") ? "flex-1 bg-transparent" : ""}`}
-                            onClick={() => handleDeleteRole(role.id)}
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>)}
+                              onClick={() => handleDeleteRole(role.id)}
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>)}
                         </div>
                       </div>
                     </CardContent>
@@ -698,7 +698,7 @@ export function RolesManagement() {
             </TabsContent>
           </>
         )}
-        {can(systemPermissions,"View_Users") && (<>
+        {can(systemPermissions, "View_Users") && (<>
           {/* Permisos */}
           <TabsContent value="permissions" className="space-y-6">
             <div>

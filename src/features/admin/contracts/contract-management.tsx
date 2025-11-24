@@ -260,7 +260,7 @@ export function ContractsManagement() {
             <CardTitle>Todos los Contratos</CardTitle>
             <div className="flex items-center space-x-2">
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-40 hover:cursor-pointer">
+                <SelectTrigger className="max-w-40 hover:cursor-pointer">
                   <SelectValue placeholder="Filtrar estado" />
                 </SelectTrigger>
                 <SelectContent>
@@ -272,7 +272,7 @@ export function ContractsManagement() {
               </Select>
               <Input
                 placeholder="Buscar contratos..."
-                className="w-64"
+                className="max-w-64"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />

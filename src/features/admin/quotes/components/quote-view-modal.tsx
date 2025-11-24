@@ -64,10 +64,7 @@ export function QuoteViewModal({ quote, open, onOpenChange }: QuoteReadViewModal
               <Eye className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <DialogTitle className="text-2xl font-bold">Ver Cotización</DialogTitle>
-              <DialogDescription className="text-sm mt-1">
-                Cotización #{quote.id} - Solo lectura
-              </DialogDescription>
+              <DialogTitle className="text-2xl font-bold">Detalles de Cotización QTZ-{quote.id}</DialogTitle>
             </div>
           </div>
         </DialogHeader>

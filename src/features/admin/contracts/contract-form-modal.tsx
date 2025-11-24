@@ -9,7 +9,7 @@ import { Label } from "@/src/shared/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/shared/components/ui/select"
 import { Checkbox } from "@/src/shared/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
-import { Plus, Trash2 } from "lucide-react"
+import { FileText, Plus, Trash2 } from "lucide-react"
 import { SignaturePad } from "@/src/lib/signature-pad"
 import { getServicesAction, getVehiclesAction } from "./contract.actions"
 
@@ -157,12 +157,19 @@ export function ContractFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="md:min-w-5xl md:max-w-6xl max-w-11/12 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{initialData ? "Editar Contrato" : "Crear Nuevo Contrato"}</DialogTitle>
-          <DialogDescription>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <FileText className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <DialogTitle className="text-2xl font-bold">{initialData ? "Editar Contrato" : "Crear Nuevo Contrato"}</DialogTitle>
+            </div>
+          </div>
+          {/* <DialogDescription>
             {initialData
               ? "Actualiza los detalles del contrato"
               : "Completa la información para crear un nuevo contrato"}
-          </DialogDescription>
+          </DialogDescription> */}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
