@@ -21,7 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/src/shared/components/ui/dialog"
-import { Plus, Edit, Trash2, Search, XCircle, CheckCircle, Loader2 } from "lucide-react"
+import { Plus, Edit, Trash2, Search, XCircle, CheckCircle, Loader2, FileText } from "lucide-react"
 
 import type { RoleWithPermissions, Permission, UserWithRole } from "@/src/lib/types"
 import { createUser, deleteUser, getUsers, updateUser } from "./actions/user.actions"
@@ -579,10 +579,17 @@ export function RolesManagement() {
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>{editingRole ? "Editar" : "Crear Nuevo"} Rol</DialogTitle>
-                      <DialogDescription>
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10">
+                          <FileText className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <DialogTitle>{editingRole ? "Editar" : "Crear Nuevo"} Rol</DialogTitle>
+                        </div>
+                      </div>
+                      {/* <DialogDescription>
                         {editingRole ? "Modifica" : "Define"} un rol con permisos específicos
-                      </DialogDescription>
+                      </DialogDescription> */}
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>
