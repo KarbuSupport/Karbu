@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/component
 import { Download, Eye, X } from "lucide-react"
 import { downloadContractPDF } from "@/src/lib/contract-pdf-generator"
 import { QrViewer } from "@/src/shared/hooks/QrViewer"
+import { generateQrImg } from "@/src/lib/generateQr"
 
 interface ContractViewModalProps {
   contract: any
@@ -31,6 +32,19 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
     }
     return statusNames[name] || "Desconocido"
   }
+
+   async function handleDownloadContract(contract: any) {
+      let contractWithQr = { ...contract }
+  
+      // Si tiene qrId pero no qrCode, generamos QR
+      if (contract.qrCode) {
+        const { qrBase64, qrId } = await generateQrImg(contract.qrCode)
+        contractWithQr.qrCode = qrBase64.replace(/^data:image\/png;base64,/, "")
+        contractWithQr.qrCodeId = qrId
+      }
+  
+      downloadContractPDF(contractWithQr)
+    }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -254,7 +268,7 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
               Cerrar
             </Button>
             <Button
-              onClick={() => downloadContractPDF(contract)}
+              onClick={() => handleDownloadContract(contract as any)}
               className="hover:cursor-pointer">
               <Download className="w-4 h-4 mr-2" />
               Descargar PDF
