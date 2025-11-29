@@ -293,8 +293,9 @@ export function ContractFormModal({
             </CardContent>
           </Card>
 
+          TODO: Eliminar profeco 
           {/* PROFECO */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle className="text-lg">Información PROFECO</CardTitle>
             </CardHeader>
@@ -318,7 +319,7 @@ export function ContractFormModal({
                 />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Consentimientos */}
           <Card>

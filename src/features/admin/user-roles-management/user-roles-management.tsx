@@ -476,6 +476,7 @@ export function RolesManagement() {
                   <div className="flex items-center justify-between">
                     <CardTitle>Usuarios Activos</CardTitle>
                     <div className="flex items-center space-x-2">
+                      {/* TODO: Conectar buscador */}
                       <Input placeholder="Buscar usuarios del sistema..." className="max-w-64" />
                       <Button
                         variant="outline"

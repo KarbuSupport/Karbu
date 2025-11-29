@@ -38,10 +38,10 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
 
   // Load quote data when editing
   useEffect(() => {
-    if (!isEdit) {
+    if (!isEdit && open) {
       setFormData(formQuoteModel);
     }
-    if (quote) {
+    if (isEdit && quote && open) {
       setFormData({
         vehicle: {
           id: quote.vehicle.id,
@@ -1275,7 +1275,7 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                     <Input
                       id="repairEstimate"
-                      type="number"
+                      type="text"
                       step="0.01"
                       placeholder="0.00"
                       className="h-11 pl-8 text-lg font-semibold"
@@ -1367,9 +1367,9 @@ export function QuoteFormModal({ open, onOpenChange, quote, onSuccess, isEdit }:
               Cancelar
             </Button>
             <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex-1 h-11 hover:cursor-pointer">
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 h-11 hover:cursor-pointer">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

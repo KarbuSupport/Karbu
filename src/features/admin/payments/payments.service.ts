@@ -66,7 +66,7 @@ export async function createPayment(data: CreatePaymentInput) {
             }
         }
         // Calcular el total del contrato basado en los servicios
-        const totalContractAmount =
+        const totalPaymentAmount =
             payment.contract.services?.reduce((sum, s) => {
                 const price = typeof s.price === "number" ? s.price : Number(s.price)
                 return sum + price
@@ -83,9 +83,9 @@ export async function createPayment(data: CreatePaymentInput) {
         // Determinar nuevo estado del contrato
         let newStatus: "CurrentAndPaid" | "CurrentAndInDebt" | "Expired"
 
-        if (paidAmount >= totalContractAmount) {
+        if (paidAmount >= totalPaymentAmount) {
             newStatus = "CurrentAndPaid"
-        } else if (paidAmount > 0 && paidAmount < totalContractAmount) {
+        } else if (paidAmount > 0 && paidAmount < totalPaymentAmount) {
             newStatus = "CurrentAndInDebt"
         } else {
             newStatus = "Expired"
@@ -110,54 +110,78 @@ export async function createPayment(data: CreatePaymentInput) {
 
 // READ - Get all payments with filters
 export async function getPayments(filters?: PaymentFilters) {
-    try {
-        const where: any = {}
+console.log('filters :', filters);
+  try {
+    const where: any = {};
 
-        // Filtrado directo por IDs
-        if (filters?.contractId) where.contractId = filters.contractId
-        if (filters?.quoteId) where.quoteId = filters.quoteId
-        if (filters?.responsibleUser) where.responsibleUser = filters.responsibleUser
+    // Filtrado directo por IDs
+    if (filters?.contractId) where.contractId = filters.contractId
+    if (filters?.quoteId) where.quoteId = filters.quoteId
+    if (filters?.responsibleUser) where.responsibleUser = filters.responsibleUser
+    if (filters?.status) where.contract.status = filters.status;
 
-        // Filtro de búsqueda
-        if (filters?.search) {
-            const search = filters.search.trim()
-            let numericId: number | undefined
+    // --------------------------
+    // 🔎 BÚSQUEDA GLOBAL
+    // --------------------------
+    if (filters?.search) {
+      const searchRaw = filters.search.trim();
+      const search = searchRaw.replace(/,/g, ''); // quitar comas para montos "2,000"
+      let numericId: number | undefined;
 
-            // Si empieza con PAY-, CNT- COT- o QTZ-, extraemos el número
-            if (/^(PAY|CNT|COT|QTZ)-(\d+)$/i.test(search)) {
-                numericId = parseInt(search.split("-")[1])
-            } else if (!isNaN(Number(search))) {
-                numericId = Number(search)
-            }
+      // Detectamos etiquetas PAY-, CNT-, QTZ-, COT-
+      const tagMatch = searchRaw.match(/^(PAY|CNT|QTZ|COT)-(\d+)$/i);
+      if (tagMatch) {
+        numericId = Number(tagMatch[2]);
+      } else if (!isNaN(Number(search))) {
+        numericId = Number(search);
+      }
 
-            where.OR = [
-                { contract: { clientName: { contains: search, mode: "insensitive" } } },
+      where.OR = [
+        // Client name
+        { contract: { clientName: { contains: searchRaw, mode: "insensitive" } } },
+
+        // Responsible User
+        { responsible: {
+            OR: [
+              { firstName: { contains: searchRaw, mode: "insensitive" } },
+              { lastName1: { contains: searchRaw, mode: "insensitive" } },
+              { lastName2: { contains: searchRaw, mode: "insensitive" } },
             ]
+        }},
 
-            if (numericId !== undefined) {
-                where.OR.push(
-                    { id: numericId },        // ID del pago
-                    { contractId: numericId }, // ID del contrato
-                    { quoteId: numericId }    // ID de la cotización
-                )
-            }
-        }
+        // Status
+        // { contract: { status: { contains: searchRaw, mode: "insensitive" } } },
+      ];
 
-        const payments = await prisma.payment.findMany({
-            where,
-            include: {
-                contract: { include: { vehicle: true, responsible: true } },
-                quote: { include: { vehicle: true } },
-                responsible: true,
-            },
-            orderBy: { id: "desc" },
-        })
-
-        return payments
-    } catch (error) {
-        console.error("Error fetching payments:", error)
-        throw new Error("Failed to fetch payments")
+      // Si es número → buscamos por IDs, montos
+      if (numericId !== undefined) {
+      console.log('numericId :', numericId);
+        where.OR.push(
+          { id: numericId },          // PAY-3 → payment.id
+          { contractId: numericId },  // CNT-3
+          { quoteId: numericId },     // QTZ-3
+          { amount: numericId }       // monto exacto 2000
+        );
+      }
     }
+
+    // Ejecutar consulta
+    const payments = await prisma.payment.findMany({
+      where,
+      include: {
+        contract: { include: { vehicle: true, responsible: true } },
+        quote: { include: { vehicle: true } },
+        responsible: true,
+      },
+      orderBy: { id: "desc" },
+    });
+
+    return payments;
+
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    throw new Error("Failed to fetch payments");
+  }
 }
 
 
@@ -170,6 +194,7 @@ export async function getPaymentById(id: number) {
                 contract: {
                     include: {
                         vehicle: true,
+                        services: true,
                         responsible: true,
                     },
                 },
@@ -180,13 +205,60 @@ export async function getPaymentById(id: number) {
                 },
                 responsible: true,
             },
-        })
-        return payment
+        });
+
+        if (!payment) return null;
+        if (!payment.contract) {
+            if (payment.quote) {
+                const totalPaymentAmount = Number(payment.quote.repairEstimate)
+                const totalPaidResult = Number(payment.amount)
+                const missingPayment = totalPaymentAmount - totalPaidResult
+                return {
+                    ...payment,
+                    totalPaymentAmount,
+                    totalPaid: totalPaidResult,
+                    missingPayment,
+                };
+            }
+            return {
+                ...payment,
+                totalPaymentAmount: 0,
+                totalPaid: 0,
+                missingPayment: 0,
+            };
+        }
+
+        // 1. Total del contrato (suma de servicios)
+        const totalPaymentAmount =
+            payment.contract.services?.reduce((sum, s) => {
+                const price = typeof s.price === "number" ? s.price : Number(s.price);
+                return sum + price;
+            }, 0) || 0;
+
+        // 2. Total pagado (USAR EL contractId DEL PAGO)
+        const totalPaidResult = await prisma.payment.aggregate({
+            where: { contractId: payment.contractId },
+            _sum: { amount: true },
+        });
+
+        const totalPaid = Number(totalPaidResult._sum.amount) ?? 0;
+
+        // 3. Pago faltante
+        const missingPayment = totalPaymentAmount - totalPaid;
+
+        return {
+            ...payment,
+            totalPaymentAmount,
+            totalPaid,
+            missingPayment,
+        };
+
     } catch (error) {
-        console.error("Error fetching payment:", error)
-        throw new Error("Failed to fetch payment")
+        console.error("Error fetching payment:", error);
+        throw new Error("Failed to fetch payment");
     }
 }
+
 
 // UPDATE
 export async function updatePayment(data: UpdatePaymentInput) {
@@ -277,6 +349,7 @@ export async function getContractsAvailableForPayment() {
                 responsible: true,
                 payments: true,
             },
+            orderBy: { id: "desc" }
         })
         return contracts
     } catch (error) {
@@ -292,8 +365,10 @@ export async function getQuotesAvailableForPayment() {
                 vehicle: true,
                 Payment: true
             },
+            orderBy: { id: "desc" }
         })
-        return quotes
+        // console.log('quotes :', quotes);
+        return quotes;
     } catch (error) {
         console.error("Error fetching available quotes:", error)
         throw new Error("Failed to fetch available quotes")

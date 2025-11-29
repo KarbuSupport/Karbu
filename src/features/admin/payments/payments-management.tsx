@@ -5,13 +5,11 @@ import { Button } from "@/src/shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
 import { Input } from "@/src/shared/components/ui/input"
 import { Label } from "@/src/shared/components/ui/label"
-import { Textarea } from "@/src/shared/components/ui/textarea"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/shared/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/shared/components/ui/select"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -25,6 +23,7 @@ import {
   updatePaymentAction,
   deletePaymentAction,
   getPaymentsStatsAction,
+  getPaymentByIdAction,
 } from "@/src/features/admin/payments/payments.actions"
 import { useAuth } from "@/src/shared/context/AuthContext"
 import { can } from "@/src/shared/functions/permissions"
@@ -62,6 +61,12 @@ interface Payment {
   } | null
 }
 
+interface ViewPayment extends Payment {
+  totalPaymentAmount: number
+  totalPaid: number
+  missingPayment: number
+}
+
 interface Contract {
   id: number
   clientName: string
@@ -71,15 +76,22 @@ interface Contract {
 interface Quote {
   id: number
   repairEstimate: any
+  vehicle: {
+    licensePlate: any
+  }
 }
 
 export function PaymentsManagement() {
+  //TODO: Boton de busqueda con filtros
+  // Requieren seguimiento
+  // Input de busqueda
   const systemPermissions = useAuth().permissions;
   const currentUserId = useAuth().userId;
   const [isNewPaymentOpen, setIsNewPaymentOpen] = useState(false)
   const [payments, setPayments] = useState<Payment[]>([])
   const [contracts, setContracts] = useState<Contract[]>([])
   const [quotes, setQuotes] = useState<Quote[]>([])
+  const [filterStatus, setFilterStatus] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [stats, setStats] = useState({
@@ -90,6 +102,7 @@ export function PaymentsManagement() {
   })
 
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
+  const [selectedViewPayment, setSelectedViewPayment] = useState<ViewPayment | null>(null)
   const [isViewOpen, setIsViewOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
@@ -110,14 +123,14 @@ export function PaymentsManagement() {
     loadData()
   }, [])
 
-  // Filtrado cuando cambia searchTerm
+  // Filtrado cuando cambia filterStatus o searchTerm
   useEffect(() => {
-    if (searchTerm.trim() === "") {
+    if (searchTerm.trim() === "" && filterStatus === "all") {
       loadData() // Si el buscador está vacío, mostrar todo
     } else {
-      searchPayments(searchTerm)
+      searchPayments();
     }
-  }, [searchTerm])
+  }, [filterStatus, searchTerm])
 
   async function loadData() {
     try {
@@ -140,10 +153,13 @@ export function PaymentsManagement() {
   }
 
   // Búsqueda de pagos según searchTerm
-  async function searchPayments(term: string) {
+  async function searchPayments() {
     try {
       setIsLoading(true)
-      const paymentsData = await getPaymentsAction({ search: term })
+      const paymentsData = await getPaymentsAction({ 
+        // status: filterStatus,
+        search: searchTerm,
+      })
       setPayments(paymentsData)
     } catch (error) {
       console.error("Error searching payments:", error)
@@ -171,7 +187,7 @@ export function PaymentsManagement() {
         method: formData.method,
         paymentDate: fixedDate,
         voucherNumber: formData.voucherNumber || undefined,
-        responsibleUser: Number(currentUserId) || 1, // TODO: Get from current user context
+        responsibleUser: Number(currentUserId) || 1,
       })
 
       // Reset form and reload data
@@ -223,24 +239,16 @@ export function PaymentsManagement() {
     }
   }
 
-  // const todayPayments = payments.filter((p) => {
-  //   const paymentDate = new Date(p.paymentDate)
-  //   const today = new Date()
-  //   return paymentDate.toDateString() === today.toDateString()
-  // }).length
-
-  // const monthlyIncome = payments
-  //   .filter((p) => {
-  //     const paymentDate = new Date(p.paymentDate)
-  //     const now = new Date()
-  //     return paymentDate.getMonth() === now.getMonth() && paymentDate.getFullYear() === now.getFullYear()
-  //   })
-  //   .reduce((sum, p) => sum + (typeof p.amount === "number" ? p.amount : Number.parseFloat(p.amount)), 0)
-
-  // const totalProcessed = payments.reduce(
-  //   (sum, p) => sum + (typeof p.amount === "number" ? p.amount : Number.parseFloat(p.amount)),
-  //   0,
-  // )
+  async function handleViewContract(paymentId: number) {
+    try {
+      const data = await getPaymentByIdAction(paymentId)
+      await setSelectedViewPayment(data);
+      setIsViewOpen(true);
+    } catch (error) {
+      setIsViewOpen(false);
+      console.error("Error getting payment:", error)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -280,8 +288,8 @@ export function PaymentsManagement() {
                     <SelectValue placeholder="Seleccionar tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="contract">Pago de Contrato</SelectItem>
-                    <SelectItem value="quote">Pago de Cotización</SelectItem>
+                    <SelectItem className="hover:cursor-pointer" value="contract">Pago de Contrato</SelectItem>
+                    <SelectItem className="hover:cursor-pointer" value="quote">Pago de Cotización</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -298,8 +306,8 @@ export function PaymentsManagement() {
                     </SelectTrigger>
                     <SelectContent>
                       {contracts.map((contract) => (
-                        <SelectItem key={contract.id} value={contract.id.toString()}>
-                          {contract.id} - {contract.clientName}
+                        <SelectItem className="hover:cursor-pointer" key={contract.id} value={contract.id.toString()}>
+                          CNT-{contract.id} - {contract.clientName} {}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -318,7 +326,7 @@ export function PaymentsManagement() {
                     <SelectContent>
                       {quotes.map((quote) => (
                         <SelectItem className="hover:cursor-pointer" key={quote.id} value={quote.id.toString()}>
-                          Cotización {quote.id}
+                          QTZ-{quote.id} - Placas: {quote.vehicle.licensePlate}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -443,6 +451,15 @@ export function PaymentsManagement() {
           <div className="flex items-center justify-between">
             <CardTitle>Historial de Pagos</CardTitle>
             <div className="flex items-center space-x-2">
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="max-w-40 hover:cursor-pointer">
+                    <SelectValue placeholder="Filtrar estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem className="hover:cursor-pointer" value="all">Todos</SelectItem>
+                    <SelectItem className="hover:cursor-pointer" value="CurrentAndInDebt">Pagos Pendientes</SelectItem>
+                  </SelectContent>
+                </Select>
               <Input
                 placeholder="Buscar pagos..."
                 className="max-w-64"
@@ -519,10 +536,7 @@ export function PaymentsManagement() {
                             variant="ghost"
                             size="sm"
                             className="hover:cursor-pointer"
-                            onClick={() => {
-                              setSelectedPayment(payment)
-                              setIsViewOpen(true)
-                            }}>
+                            onClick={() => handleViewContract(payment.id)}>
                             <Eye className="w-4 h-4" />
                           </Button>
                           <Button
@@ -571,7 +585,7 @@ export function PaymentsManagement() {
         </CardContent>
       </Card>
 
-      {selectedPayment && (
+      {selectedViewPayment && (
         <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -579,11 +593,11 @@ export function PaymentsManagement() {
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Eye className="h-5 w-5 text-primary" />
                 </div>
-                <DialogTitle className="text-2xl font-bold">Detalles del Pago PAY-{selectedPayment.id}</DialogTitle>
+                <DialogTitle className="text-2xl font-bold">Detalles del Pago PAY-{selectedViewPayment.id}</DialogTitle>
               </div>
 
             </DialogHeader>
-            <PaymentViewReadOnly payment={selectedPayment} />
+            <PaymentViewReadOnly payment={selectedViewPayment} />
             <Button
               onClick={() => setIsViewOpen(false)}
               variant="outline"

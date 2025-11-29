@@ -1,12 +1,10 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
 import { Button } from "@/src/shared/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/src/shared/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/shared/components/ui/dialog"
 import { ScrollArea } from "@/src/shared/components/ui/scroll-area"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
-import { useToast } from "@/src/shared/hooks/use-toast"
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/shared/components/ui/card"
 import { Car, ClipboardCheck, FileEdit, FileText, Loader2, Wrench, Eye } from 'lucide-react'
 import { Badge } from "@/src/shared/components/ui/badge"
 import { Separator } from "@/src/shared/components/ui/separator"
@@ -18,7 +16,6 @@ interface QuoteReadViewModal {
   onOpenChange: (open: boolean) => void
   quote: QuoteWithRelations | null
 }
-
 const getReadableValue = (value: string | number | boolean | null | undefined): string => {
   if (value === null || value === undefined) return "-"
   if (typeof value === "boolean") return value ? "Sí" : "No"
@@ -26,30 +23,7 @@ const getReadableValue = (value: string | number | boolean | null | undefined): 
 }
 
 export function QuoteViewModal({ quote, open, onOpenChange }: QuoteReadViewModal) {
-  const { toast } = useToast()
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
-
-  // const handleGeneratePDF = () => {
-  //   if (!quote) return
-    
-  //   setIsGeneratingPDF(true)
-  //   try {
-  //     toast({
-  //       title: "PDF generado",
-  //       description: "El PDF de la cotización se ha descargado correctamente",
-  //     })
-  //     onOpenChange(false)
-  //   } catch (error) {
-  //     toast({
-  //       title: "Error",
-  //       description: "No se pudo generar el PDF",
-  //       variant: "destructive",
-  //     })
-  //   } finally {
-  //     setIsGeneratingPDF(false)
-  //   }
-  // }
-
+  // TODO: Visualizar quien la realizo
   if (!quote) return null
 
   const vehicleCheck = quote.vehicleChecks[0] || {}
@@ -391,16 +365,14 @@ export function QuoteViewModal({ quote, open, onOpenChange }: QuoteReadViewModal
                     return (
                       <div
                         key={service.id}
-                        className={`p-3 rounded-lg border-2 ${
-                          isSelected
-                            ? "bg-green-50 border-green-300 dark:bg-green-950/20 dark:border-green-800"
-                            : "bg-muted/50 border-border opacity-50"
-                        }`}
+                        className={`p-3 rounded-lg border-2 ${isSelected
+                          ? "bg-green-50 border-green-300 dark:bg-green-950/20 dark:border-green-800"
+                          : "bg-muted/50 border-border opacity-50"
+                          }`}
                       >
                         <div className="flex items-center gap-2">
-                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                            isSelected ? "bg-green-500 border-green-600" : "border-muted-foreground"
-                          }`}>
+                          <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${isSelected ? "bg-green-500 border-green-600" : "border-muted-foreground"
+                            }`}>
                             {isSelected && <span className="text-white text-xs">✓</span>}
                           </div>
                           <p className="text-sm font-medium">{service.label}</p>
@@ -473,37 +445,29 @@ export function QuoteViewModal({ quote, open, onOpenChange }: QuoteReadViewModal
               </CardContent>
             </Card>
           </div>
-                  <div className="px-6 py-4 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="flex-1 h-11 hover:cursor-pointer"
-            >
-              Cerrar
-            </Button>
+          <div className="px-6 py-4 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="flex-1 h-11 hover:cursor-pointer"
+              >
+                Cerrar
+              </Button>
 
-            <Button
-              type="button"
-              onClick={() => generateQuotePDF(quote as QuoteFormData, String(quote.id))}
-              disabled={isGeneratingPDF}
-              className="flex-1 h-11 hover:cursor-pointer"
-            >
-              {isGeneratingPDF ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generando...
-                </>
-              ) : (
-                <>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Descargar PDF
-                </>
-              )}
-            </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  generateQuotePDF(quote as QuoteFormData, String(quote.id))
+                }}
+                className="flex-1 h-11 hover:cursor-pointer"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Descargar PDF
+              </Button>
+            </div>
           </div>
-        </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>

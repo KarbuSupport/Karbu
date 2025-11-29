@@ -48,12 +48,27 @@ export class QuoteService {
   /**
    * Helper to clean empty fields
    */
-  private static cleanObject<T extends Record<string, any>>(obj: T): T {
-    return Object.fromEntries(
-      Object.entries(obj).filter(([_, v]) => v !== undefined && v !== null)
-    ) as T
-  }
+  private static cleanAndRemoveIds<T extends Record<string, any>>(obj: T): T {
+    if (Array.isArray(obj)) {
+      return obj.map(QuoteService.cleanAndRemoveIds) as any;
+    }
 
+    const result: any = {};
+
+    for (const [key, value] of Object.entries(obj)) {
+      if (key === 'id') continue; // eliminar propiedades 'id'
+      if (key === 'quoteId') continue; // eliminar propiedades 'quoteId'
+
+      if (value !== null && value !== undefined) {
+        result[key] =
+          typeof value === 'object' && value !== null
+            ? QuoteService.cleanAndRemoveIds(value)
+            : value;
+      }
+    }
+
+    return result as T;
+  }
   /**
    * Create a new quote with vehicle and related data
    */
@@ -62,7 +77,7 @@ export class QuoteService {
 
     // Clean objects
     const cleanedVehicleCheck = vehicleCheck
-      ? this.cleanObject({
+      ? this.cleanAndRemoveIds({
         ...vehicleCheck,
         id: undefined,
         quoteId: undefined,
@@ -70,7 +85,7 @@ export class QuoteService {
       : undefined
 
     const cleanedVehicleService = vehicleService
-      ? this.cleanObject({
+      ? this.cleanAndRemoveIds({
         ...vehicleService,
         id: undefined,
         quoteId: undefined,
@@ -166,10 +181,10 @@ export class QuoteService {
 
     // Clean new ones
     const cleanedVehicleCheck = vehicleCheck
-      ? this.cleanObject(vehicleCheck)
+      ? this.cleanAndRemoveIds(vehicleCheck)
       : undefined
     const cleanedVehicleService = vehicleService
-      ? this.cleanObject(vehicleService)
+      ? this.cleanAndRemoveIds(vehicleService)
       : undefined
 
     // Update quote
@@ -222,30 +237,30 @@ export class QuoteService {
   /**
    * Get quotes statistics
    */
-static async getQuotesStats() {
-  // 1) Total de cotizaciones
-  const totalResult = await prisma.$queryRaw<{ count: number }[]>`
+  static async getQuotesStats() {
+    // 1) Total de cotizaciones
+    const totalResult = await prisma.$queryRaw<{ count: number }[]>`
     SELECT COUNT(*)::int AS count FROM "Quote";
   `
-  const total = totalResult[0]?.count ?? 0
+    const total = totalResult[0]?.count ?? 0
 
-  // 2) Total con purchaseCheck = true
-  const purchaseCheckResult = await prisma.$queryRaw<{ count: number }[]>`
+    // 2) Total con purchaseCheck = true
+    const purchaseCheckResult = await prisma.$queryRaw<{ count: number }[]>`
     SELECT COUNT(*)::int AS count FROM "Quote" WHERE "purchaseCheck" = true;
   `
-  const withPurchaseCheck = purchaseCheckResult[0]?.count ?? 0
+    const withPurchaseCheck = purchaseCheckResult[0]?.count ?? 0
 
-  // 3) Suma de repairEstimate
-  const estimateResult = await prisma.$queryRaw<{ sum: number | null }[]>`
+    // 3) Suma de repairEstimate
+    const estimateResult = await prisma.$queryRaw<{ sum: number | null }[]>`
     SELECT SUM("repairEstimate") AS sum FROM "Quote";
   `
-  const totalEstimate = estimateResult[0]?.sum ?? 0
+    const totalEstimate = estimateResult[0]?.sum ?? 0
 
-  return {
-    total,
-    withPurchaseCheck,
-    totalEstimate,
+    return {
+      total,
+      withPurchaseCheck,
+      totalEstimate,
+    }
   }
-}
 
 }

@@ -33,18 +33,18 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
     return statusNames[name] || "Desconocido"
   }
 
-   async function handleDownloadContract(contract: any) {
-      let contractWithQr = { ...contract }
-  
-      // Si tiene qrId pero no qrCode, generamos QR
-      if (contract.qrCode) {
-        const { qrBase64, qrId } = await generateQrImg(contract.qrCode)
-        contractWithQr.qrCode = qrBase64.replace(/^data:image\/png;base64,/, "")
-        contractWithQr.qrCodeId = qrId
-      }
-  
-      downloadContractPDF(contractWithQr)
+  async function handleDownloadContract(contract: any) {
+    let contractWithQr = { ...contract }
+
+    // Si tiene qrId pero no qrCode, generamos QR
+    if (contract.qrCode) {
+      const { qrBase64, qrId } = await generateQrImg(contract.qrCode)
+      contractWithQr.qrCode = qrBase64.replace(/^data:image\/png;base64,/, "")
+      contractWithQr.qrCodeId = qrId
     }
+
+    downloadContractPDF(contractWithQr)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -226,10 +226,29 @@ export function ContractViewModal({ contract, open, onOpenChange }: ContractView
                     </div>
                   )
                 })}
+                {/* TOTAL */}
                 <div className="flex justify-between items-center pt-3 border-t-2 font-bold text-lg">
                   <span>Total</span>
                   <span>${totalPrice.toLocaleString()}</span>
                 </div>
+
+                {/* ESTADO DEL PAGO */}
+                <div className="mt-4 p-3 rounded-lg bg-muted flex justify-between items-center">
+                  <p className="text-sm text-muted-foreground">
+                    {contract.missingPayment > 0 ? "Saldo pendiente" : "Estado del contrato"}
+                  </p>
+
+                  {contract.missingPayment > 0 ? (
+                    <span className="text-red-600 font-semibold text-lg">
+                      ${contract.missingPayment.toLocaleString()}
+                    </span>
+                  ) : (
+                    <span className="text-green-600 font-semibold text-lg">
+                      Liquidado
+                    </span>
+                  )}
+                </div>
+
               </div>
             </CardContent>
           </Card>

@@ -2,6 +2,7 @@ import { prisma } from "@/src/lib/prisma"
 import { Prisma } from "@prisma/client"
 
 export class ContractService {
+
   static async createContract(data: {
     clientName: string
     vehicleId: number
@@ -274,12 +275,41 @@ export class ContractService {
           payments: true,
         },
       })
-      return contract
+
+      if (!contract) return null
+
+      // 1. Total del contrato basado en servicios
+      const totalPaymentAmount =
+        contract.services?.reduce((sum, s) => {
+          const price = typeof s.price === "number" ? s.price : Number(s.price)
+          return sum + price
+        }, 0) || 0
+
+      // 2. Total pagado
+      const totalPaidResult = await prisma.payment.aggregate({
+        where: { contractId: id },
+        _sum: { amount: true },
+      })
+
+      const totalPaid = totalPaidResult._sum.amount ?? 0
+
+      // 3. Calcular pago faltante
+      const missingPayment = totalPaymentAmount - Number(totalPaid)
+
+      // 4. Agregar propiedad al contrato
+      return {
+        ...contract,
+        totalPaymentAmount,
+        totalPaid,
+        missingPayment,
+      }
+
     } catch (error) {
       console.error("Error fetching contract:", error)
       throw error
     }
   }
+
 
   static async updateContract(
     id: number,
